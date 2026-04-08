@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Let Me Re-Introduce Myself — LinkedIn Post Writer</title>
+<title>(Re)Introduce Myself — LinkedIn Post Writer</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
@@ -539,8 +539,8 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 <div class="container">
   <div class="header">
-    <h1>Write a LinkedIn Post That<br>Makes You <em>Unforgettable</em></h1>
-    <p class="subtitle">Answer a few questions and get a ready-to-paste "Let me re-introduce myself" post — human, warm, and uniquely you.</p>
+    <h1>Write Your First LinkedIn Post<br>That Sounds Like <em>You</em></h1>
+    <p class="subtitle">Answer a few questions and get a ready-to-paste "(re)introduce myself" post — warm, human, and uniquely yours.</p>
   </div>
 
   <div class="error" id="error"></div>
@@ -712,11 +712,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
         </div>
 
         <div class="form-group">
-          <label>Pick a comment question for your audience</label>
-          <p class="hint">We'll generate 3 options based on your answers. Pick the one that feels most you.</p>
-          <button class="btn-secondary btn-sm" onclick="genUploadQOptions()" id="upQBtn" style="margin-bottom:0.75rem">Generate options</button>
-          <div class="option-grid" id="up-question-options">
-            <div class="option-card" style="color:var(--muted);font-style:italic;border-style:dashed;cursor:default">Click "Generate options" above after filling in the fields</div>
+          <label>How do you want to close the post?</label>
+          <p class="hint">A warm, light sign-off — no audience question (you're just getting started!)</p>
+          <div class="option-grid" id="up-cta-options">
+            <div class="option-card" onclick="selectOption(this, 'up-cta-options')">Happy to be here — let's connect and chat!</div>
+            <div class="option-card" onclick="selectOption(this, 'up-cta-options')">If you have any questions, feel free to reach out. My DMs are open.</div>
+            <div class="option-card" onclick="selectOption(this, 'up-cta-options')">Looking forward to meeting new people here. Don't be a stranger!</div>
           </div>
         </div>
 
@@ -827,11 +828,12 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       </div>
 
       <div class="form-group">
-        <label>Pick a comment question for your audience</label>
-        <p class="hint">We'll generate 3 options based on your answers</p>
-        <button class="btn-secondary btn-sm" onclick="genFormQOptions()" id="fQBtn" style="margin-bottom:0.75rem">Generate options</button>
-        <div class="option-grid" id="f-question-options">
-          <div class="option-card" style="color:var(--muted);font-style:italic;border-style:dashed;cursor:default">Click "Generate options" above after filling in the fields</div>
+        <label>How do you want to close the post?</label>
+        <p class="hint">A warm, light sign-off — no audience question (you're just getting started!)</p>
+        <div class="option-grid" id="f-cta-options">
+          <div class="option-card" onclick="selectOption(this, 'f-cta-options')">Happy to be here — let's connect and chat!</div>
+          <div class="option-card" onclick="selectOption(this, 'f-cta-options')">If you have any questions, feel free to reach out. My DMs are open.</div>
+          <div class="option-card" onclick="selectOption(this, 'f-cta-options')">Looking forward to meeting new people here. Don't be a stranger!</div>
         </div>
       </div>
     </div>
@@ -900,7 +902,7 @@ const INTERVIEW_QS = [
   { key: 'culture', text: 'Is there a cultural or background detail that shaped who you are?', hint: 'Where you grew up, a tradition, a mindset you inherited', placeholder: "e.g. I grew up as the middle child — communication and negotiation skills are 10/10", type: 'textarea' },
   { key: 'cares', text: 'What do you care about that has nothing to do with your career?', hint: 'Family, cause, obsession, fear, dream — what drives you when no one is watching', placeholder: 'e.g. Being a dad. My son is my everything.', type: 'textarea' },
   { key: 'vulnerable', text: "What's one thing about your journey that was genuinely hard — that you're now okay sharing?", hint: "This is the detail that makes people trust you", placeholder: "e.g. I went broke twice before 30 and almost gave up", type: 'textarea' },
-  { key: 'question', text: "Pick a comment question for your audience", hint: "We'll generate 3 options based on your previous answers — pick the one that feels most you", placeholder: "", type: 'options' },
+  { key: 'cta', text: "How do you want to close the post?", hint: "A warm, light sign-off. You're just getting started — no need to ask the audience a question", placeholder: "", type: 'cta' },
 ];
 
 let interviewIdx = 0;
@@ -1024,19 +1026,20 @@ async function renderInterviewQ() {
   const container = document.getElementById('interviewQ');
   const prev = interviewAnswers[q.key] || '';
 
-  if (q.type === 'options') {
+  if (q.type === 'cta') {
+    const ctaOptions = [
+      "Happy to be here — let's connect and chat!",
+      "If you have any questions, feel free to reach out. My DMs are open.",
+      "Looking forward to meeting new people here. Don't be a stranger!"
+    ];
     container.innerHTML = `
       <div class="q-number">Question ${interviewIdx + 1} of ${total}</div>
       <div class="q-text">${esc(q.text)}</div>
       <div class="q-hint">${esc(q.hint)}</div>
-      <div class="option-grid" id="iv-options">
-        <div class="option-card" style="color:var(--muted);font-style:italic;border-style:dashed;cursor:default">Generating options based on your answers...</div>
+      <div class="option-grid" id="iv-cta-options">
+        ${ctaOptions.map(opt => `<div class="option-card${prev === opt ? ' selected' : ''}" onclick="selectOption(this, 'iv-cta-options')">${esc(opt)}</div>`).join('')}
       </div>
     `;
-    document.getElementById('interviewNextBtn').disabled = true;
-    const options = await generateQuestionOptions(interviewAnswers);
-    renderOptionCards('iv-options', options, prev);
-    document.getElementById('interviewNextBtn').disabled = false;
   } else {
     const inputEl = q.type === 'textarea'
       ? `<textarea id="iv-answer" placeholder="${esc(q.placeholder)}">${esc(prev)}</textarea>`
@@ -1055,33 +1058,7 @@ async function renderInterviewQ() {
   document.getElementById('interviewNextBtn').textContent = interviewIdx === total - 1 ? 'Generate my post' : 'Next';
 }
 
-// Generate 3 comment question options from context
-async function generateQuestionOptions(data) {
-  const context = Object.entries(data).filter(([k,v]) => v).map(([k,v]) => `${k}: ${v}`).join('\n');
-  try {
-    const result = await callClaude(
-      'You generate comment questions for LinkedIn posts. Return ONLY a JSON array of exactly 3 strings. Each should be a personal, fun, easy-to-answer question that sparks real conversation. Not about business/niche — about life, personality, experiences. Keep each under 80 characters. No numbering, no quotes around the array items beyond JSON syntax.',
-      `Based on this person's details, suggest 3 comment questions:\n\n${context}`
-    );
-    const cleaned = result.replace(/```json?\s*/gi, '').replace(/```/g, '').trim();
-    return JSON.parse(cleaned);
-  } catch (e) {
-    return [
-      "What's the most surprising career change you've ever made?",
-      "What's one thing about you that doesn't match your job title?",
-      "What did 10-year-old you want to be when you grew up?"
-    ];
-  }
-}
-
 let selectedQuestion = '';
-
-function renderOptionCards(containerId, options, preselected) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = options.map((opt, i) =>
-    `<div class="option-card${preselected === opt ? ' selected' : ''}" onclick="selectOption(this, '${containerId}')">${esc(opt)}</div>`
-  ).join('');
-}
 
 function selectOption(el, containerId) {
   const parent = document.getElementById(containerId);
@@ -1090,42 +1067,9 @@ function selectOption(el, containerId) {
   selectedQuestion = el.textContent;
 }
 
-async function genUploadQOptions() {
-  const btn = document.getElementById('upQBtn');
-  btn.disabled = true; btn.textContent = 'Generating...';
-  const data = {
-    context: extractedContext,
-    surprise: document.getElementById('up-surprise').value,
-    quirk: document.getElementById('up-quirk').value,
-    good: document.getElementById('up-good').value,
-    food: document.getElementById('up-food').value,
-    cares: document.getElementById('up-cares').value,
-  };
-  const options = await generateQuestionOptions(data);
-  renderOptionCards('up-question-options', options, '');
-  btn.disabled = false; btn.textContent = 'Regenerate options';
-}
-
-async function genFormQOptions() {
-  const btn = document.getElementById('fQBtn');
-  btn.disabled = true; btn.textContent = 'Generating...';
-  const data = {
-    name: document.getElementById('f-name').value,
-    role: document.getElementById('f-role').value,
-    before: document.getElementById('f-before').value,
-    quirk: document.getElementById('f-quirk').value,
-    good: document.getElementById('f-good').value,
-    food: document.getElementById('f-food').value,
-    cares: document.getElementById('f-cares').value,
-  };
-  const options = await generateQuestionOptions(data);
-  renderOptionCards('f-question-options', options, '');
-  btn.disabled = false; btn.textContent = 'Regenerate options';
-}
-
 function interviewNext() {
   const q = INTERVIEW_QS[interviewIdx];
-  if (q.type === 'options') {
+  if (q.type === 'cta') {
     interviewAnswers[q.key] = selectedQuestion;
   } else {
     const val = document.getElementById('iv-answer').value.trim();
@@ -1143,7 +1087,7 @@ function interviewNext() {
 function interviewPrev() {
   if (interviewIdx > 0) {
     const q = INTERVIEW_QS[interviewIdx];
-    if (q.type === 'options') {
+    if (q.type === 'cta') {
       interviewAnswers[q.key] = selectedQuestion;
     } else {
       interviewAnswers[q.key] = document.getElementById('iv-answer').value.trim();
@@ -1157,7 +1101,7 @@ function interviewPrev() {
 // Collect input data
 // ===========================
 function collectUploadData() {
-  const sel = document.querySelector('#up-question-options .option-card.selected');
+  const sel = document.querySelector('#up-cta-options .option-card.selected');
   return {
     extractedContext,
     hook: document.getElementById('up-hook').value.trim(),
@@ -1169,12 +1113,12 @@ function collectUploadData() {
     quirk: document.getElementById('up-quirk').value.trim(),
     cares: document.getElementById('up-cares').value.trim(),
     vulnerable: document.getElementById('up-vulnerable').value.trim(),
-    question: sel ? sel.textContent : '',
+    cta: sel ? sel.textContent : '',
   };
 }
 
 function collectFormData() {
-  const sel = document.querySelector('#f-question-options .option-card.selected');
+  const sel = document.querySelector('#f-cta-options .option-card.selected');
   return {
     name: document.getElementById('f-name').value.trim(),
     role: document.getElementById('f-role').value.trim(),
@@ -1189,7 +1133,7 @@ function collectFormData() {
     culture: document.getElementById('f-culture').value.trim(),
     cares: document.getElementById('f-cares').value.trim(),
     vulnerable: document.getElementById('f-vulnerable').value.trim(),
-    question: sel ? sel.textContent : '',
+    cta: sel ? sel.textContent : '',
   };
 }
 
@@ -1215,65 +1159,112 @@ function buildUserPrompt(data) {
   if (data.culture) parts.push('Cultural/background detail: ' + data.culture);
   if (data.cares) parts.push('What they care about beyond career: ' + data.cares);
   if (data.vulnerable) parts.push('Vulnerable/hard detail: ' + data.vulnerable);
-  if (data.question) parts.push('Question for comments: ' + data.question);
+  if (data.cta) parts.push('Closing CTA style: ' + data.cta);
 
   return parts.join('\n\n');
 }
 
 function getStyleInstruction() {
   const styles = {
-    numbered: `STYLE: "Numbered Facts" — Write a list of numbered or emoji-bulleted facts (like "here are 9 facts about me"). Keep each fact to 1-3 sentences. Use emojis as bullet markers. The list should feel playful, not like a resume. Mix professional facts with personal, fun, and surprising ones. End with a warm invitation to DM or comment.`,
-    narrative: `STYLE: "Personal Narrative" — Write a flowing, personal story. No numbered list. Build contrast between who they were and who they are. Use short punchy paragraphs. Include humor and unexpected reveals. The reader should feel like they're hearing this from a friend at a dinner party. End with warmth and a specific question.`,
-    authority: `STYLE: "Authority + Heart" — Open with a strong credibility statement (followers, achievements, what they're known for). Then break the professional mask and reveal the human underneath. Structure: what people know me for -> what people don't know about me -> what drives me. End with a community welcome.`,
-    letter: `STYLE: "Letter to a Friend" — Write like a personal letter. No structure, no bullets, no headers. Just warmth and honesty flowing from one thought to the next. Start casual, get real in the middle, end with something that makes the reader smile. It should feel like meeting someone at a dinner party who turns out to be way more interesting than their job title suggests.`,
+    numbered: `STYLE: "Numbered Facts" — Write a list of numbered or emoji-bulleted facts (like "here are 9 facts about me"). Keep each fact to 1-3 sentences. Use emojis as bullet markers. The list should feel playful, not like a resume. Mix professional facts with personal, fun, and surprising ones. End with the user's chosen warm CTA sign-off.`,
+    narrative: `STYLE: "Personal Narrative" — Write a flowing, personal story. No numbered list. Build contrast between who they were and who they are. Use short punchy paragraphs. Include humor and unexpected reveals. The reader should feel like they're hearing this from a friend at a dinner party. End with the user's chosen warm CTA sign-off.`,
+    authority: `STYLE: "Authority + Heart" — Open with a strong credibility statement (followers, achievements, what they're known for). Then break the professional mask and reveal the human underneath. Structure: what people know me for -> what people don't know about me -> what drives me. End with the user's chosen warm CTA sign-off.`,
+    letter: `STYLE: "Letter to a Friend" — Write like a personal letter. No structure, no bullets, no headers. Just warmth and honesty flowing from one thought to the next. Start casual, get real in the middle, end with something that makes the reader smile. End with the user's chosen warm CTA sign-off.`,
   };
   return styles[selectedStyle] || styles.narrative;
 }
 
 const SYSTEM_PROMPT = `You are a LinkedIn post ghostwriter. You write posts that feel deeply human, specific, and real.
 
-TASK: Write a "Let me re-introduce myself" LinkedIn post based on the user's personal details.
+TASK: Write a "(re)introduce myself" LinkedIn post based on the user's personal details. This is likely their FIRST real post — they don't have an established audience yet.
 
-${getStyleInstruction ? '' : ''}
+LANGUAGE RULE: Detect the language of the user's input. If they write in English, write the post in English. If they write in Russian, write in Russian. If in Spanish, write in Spanish. Match their language exactly. Default is English.
 
-ABSOLUTE WRITING RULES — FOLLOW THESE OR THE POST FAILS:
+=== ANTI-AI WRITING CHECKLIST (MANDATORY — from the "How to Stop Writing Like a Robot" guide) ===
 
-1. ANTI-AI LANGUAGE — NEVER use these words or patterns:
-   - "passionate about", "driven by", "committed to", "dedicated to"
-   - "journey", "landscape", "tapestry", "delve", "foster", "cultivate"
-   - "pivotal", "crucial", "vibrant", "showcase", "underscore", "highlight"
-   - "serves as", "stands as", "represents", "reflects broader"
-   - "In today's world", "In an era of", "It's no secret that"
-   - "I'm thrilled to", "Excited to share", "Proud to announce"
-   - Never start a sentence with "Additionally" or "Furthermore"
-   - Don't use "testament to", "game-changer", "deep dive"
-   - Avoid any phrase that sounds like a LinkedIn cliche or corporate speak
+1. EXAGGERATION PROBLEM — kill on sight:
+   - NEVER: key/crucial/fundamental/pivotal/groundbreaking/revolutionary/innovative/outstanding/legendary/invaluable
+   - NEVER attach small facts to grand narratives. "Restaurant opened in 1987" does NOT need to "mark a turning point in the culinary evolution of the district"
+   - NEVER replace "is/are/has" with fancy alternatives: "serves as", "stands as", "represents", "embodies", "exemplifies", "boasts". Just say "is". The word "is" is fine. Use it.
 
-2. TEXTURE OVER GENERICS — Every fact must have a specific detail:
+2. FAKE BALANCE PROBLEM:
+   - NEVER use "Not X. Not Y. Just Z." staccato patterns — real people don't talk like Nike slogans
+   - NEVER use "not just... but also" / "it's not just a launch — it's a reimagining". Maximum once per 2000 words, and only if earned
+   - NEVER use fake "however"/"nevertheless" pivots with no real contrast behind them
+
+3. RHYTHM PROBLEM:
+   - VARY sentence length. Short punch. Then a longer, winding thought. Then a fragment. NOT metronomic same-length sentences
+   - MAX one em-dash per paragraph. A period works fine for "dramatic reveals"
+   - BREAK the rule of three. Real lists have 2 items, or 4, or 7. Compulsive tripling = AI tell
+   - VARY paragraph length. One-sentence paragraph for emphasis. Dense block for complex ideas. NOT all paragraphs the same size
+
+4. VAGUENESS PROBLEM:
+   - NEVER: "experts say", "widely recognized", "extensively documented" — if you can't name it, don't claim it
+   - NEVER use filler participle tails: "...highlighting their commitment to creative evolution" — just delete everything after the main verb
+   - NEVER use fake ranges: "from community engagement to technological innovation" — that's just two unrelated things in a trench coat
+
+5. WORD CHOICE — AI VOCABULARY BAN LIST:
+   Nouns: landscape (abstract), tapestry, interplay, intricacies, testament, synergy, ecosystem (non-bio), framework
+   Verbs: delve, underscore, highlight, showcase, foster, cultivate, leverage, optimize, spearhead, unravel
+   Adjectives: key, crucial, vibrant, multifaceted, enduring, nuanced, holistic, cutting-edge, seamless, comprehensive
+   Transitions: "Additionally" (start of sentence), "Moreover", "Furthermore", "It's worth noting", "Importantly"
+   - Also banned: passionate about, driven by, committed to, dedicated to, game-changer, deep dive, journey (metaphorical)
+   - If you catch yourself rotating synonyms for the same thing ("platform" then "solution" then "ecosystem" then "framework") — STOP. Repeat the word. Clarity > variety.
+
+6. STRUCTURE PROBLEM:
+   - NEVER use "Despite... challenges" formula (positive → "despite" → challenges → but actually fine → vague optimism)
+   - NEVER turn descriptions into tourism brochures or sales pitches. "Nestled in the heart of" = instant ban
+   - NEVER end sections with "In summary"/"In conclusion" that just repeat what was said
+   - NO empty adjective stacking: "vibrant and dynamic hub of innovation" — pick ONE adjective maximum, often zero
+
+7. HEDGING PROBLEM:
+   - Kill: "It's important to note that", "It's worth mentioning that", "One could argue that"
+   - Minimize "may/might/could" as safety cushions. If you know something is true, say it's true
+
+8. SUBSTANCE PROBLEM — THE MOST IMPORTANT:
+   - The post MUST have a point of view. Not balanced. Not safe. Real.
+   - Replace every generalization with a specific number, name, date, place, or story
+   - BAD: "achieved significant growth" → GOOD: "revenue went from $2M to $11M in 18 months"
+   - Leave some roughness in. A sentence that's technically too long but carries energy. A paragraph break that comes slightly early. Real writing has texture.
+
+=== END OF ANTI-AI CHECKLIST ===
+
+ADDITIONAL POST RULES:
+
+1. TEXTURE OVER GENERICS — Every fact must have a specific detail:
    - BAD: "I speak 3 languages"
    - GOOD: "I speak 3 languages — my Italian still has a Bosnian accent that makes Romans smile"
-   - BAD: "I love food"
-   - GOOD: "I'd eat burgers for every meal and I will die on that hill"
 
-3. STRUCTURE:
-   - Use short paragraphs (1-3 sentences max)
-   - Line breaks between paragraphs for LinkedIn readability
-   - Include at least one unexpected contrast (who they were vs who they are now)
-   - End with a specific, personal question — not "feel free to connect"
+2. STRUCTURE:
+   - Short paragraphs (1-3 sentences max) with line breaks for LinkedIn
+   - At least one unexpected contrast (who they were vs who they are now)
+   - End with the user's chosen CTA (warm sign-off, NOT a question for the audience)
 
-4. TONE: Like writing a letter to someone you just met and liked immediately. Warm, honest, a little playful. No corporate voice. No motivational speaker voice.
+3. TONE: Like writing a letter to someone you just met and liked immediately. Warm, honest, a little playful.
 
-5. LENGTH: Between 1200-2500 characters. LinkedIn sweet spot.
+4. LENGTH: 1200-2500 characters.
 
-6. The hook (first 1-2 lines) must stop the scroll. Use the new followers number as a natural opening if provided.
+5. The hook (first 1-2 lines) must stop the scroll. Use the new followers/connections number as a natural opening if provided.
 
-7. Do NOT add any explanatory text, headers, or meta-commentary. Return ONLY the post text, ready to paste into LinkedIn.`;
+6. Return ONLY the post text, ready to paste into LinkedIn. No explanatory text, no headers, no meta-commentary.
+
+SELF-CHECK BEFORE OUTPUTTING — run this checklist:
+1. More than 2 "AI vocabulary" words in any paragraph? → rewrite
+2. Any "not just... but also" or "Not X, not Y, just Z"? → earned?
+3. Filler participle tails? → delete them
+4. Vague "experts say" or "widely recognized"? → name or remove
+5. "Despite... challenges" anywhere? → rewrite
+6. More than 1 em-dash per paragraph? → use periods
+7. Rule of three used more than once? → break it
+8. All paragraphs the same length? → vary them
+9. Conclusion that repeats the post? → cut it
+10. Is it ACTUALLY specific? Numbers, names, places, stories? → if not, add them`;
 
 async function generatePost(data) {
   lastInputData = data;
   showScreen('screen-generating');
 
-  const systemPrompt = SYSTEM_PROMPT.replace('${getStyleInstruction ? \'\' : \'\'}', '') + '\n\n' + getStyleInstruction();
+  const systemPrompt = SYSTEM_PROMPT + '\n\n' + getStyleInstruction();
 
   const userPrompt = `Write a LinkedIn "Let me re-introduce myself" post for this person:\n\n${buildUserPrompt(data)}\n\nRemember: NO AI-sounding language. Every detail should feel real and specific. Match the style instruction exactly.`;
 
