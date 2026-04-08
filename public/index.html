@@ -6,29 +6,30 @@
 <title>Let Me Re-Introduce Myself — LinkedIn Post Writer</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0a0a0f;
-  --bg-subtle: #111118;
-  --card: rgba(255,255,255,0.04);
-  --card-hover: rgba(255,255,255,0.06);
-  --border: rgba(255,255,255,0.08);
-  --border-hover: rgba(255,255,255,0.15);
-  --text: #f0f0f5;
-  --text-secondary: #a0a0b8;
-  --muted: #6b6b80;
-  --accent: #8b7cf6;
-  --accent-glow: rgba(139,124,246,0.25);
-  --accent-hover: #a08bff;
-  --green: #4ade80;
-  --green-glow: rgba(74,222,128,0.2);
-  --input-bg: rgba(255,255,255,0.05);
-  --input-border: rgba(255,255,255,0.1);
+  --bg: #f0f4f8;
+  --bg-top: #e8eef6;
+  --card: #ffffff;
+  --border: #e1e7ef;
+  --border-hover: #c8d2e0;
+  --text: #1a2332;
+  --text-secondary: #3d4f63;
+  --muted: #7a8a9e;
+  --accent: #1a56db;
+  --accent-light: #eef2ff;
+  --accent-hover: #1347b8;
+  --green: #1a56db;
+  --input-bg: #ffffff;
+  --input-border: #d1d9e6;
   --radius: 16px;
   --radius-sm: 10px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.08);
 }
 
 body {
@@ -38,36 +39,41 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   background-image:
-    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(139,124,246,0.08), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(74,222,128,0.04), transparent);
+    radial-gradient(ellipse 90% 50% at 50% -10%, rgba(26,86,219,0.06), transparent),
+    radial-gradient(ellipse 50% 40% at 90% 10%, rgba(180,200,230,0.3), transparent);
 }
 
 .container {
-  max-width: 680px;
+  max-width: 700px;
   margin: 0 auto;
   padding: 3rem 1.5rem;
 }
 
 /* Header */
-.header { text-align: center; margin-bottom: 3rem; }
+.header { text-align: center; margin-bottom: 2.5rem; }
 
 h1 {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: 2.25rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #f0f0f5 0%, #a0a0b8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 0.6rem;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+h1 em {
+  color: var(--accent);
+  font-style: italic;
 }
 
 .subtitle {
   color: var(--muted);
   font-size: 0.95rem;
   font-weight: 400;
-  letter-spacing: 0.01em;
+  max-width: 420px;
+  margin: 0 auto;
+  line-height: 1.55;
 }
 
 /* Cards */
@@ -76,31 +82,27 @@ h1 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 2rem;
-  margin-bottom: 1.5rem;
-  backdrop-filter: blur(20px);
-  transition: border-color 0.3s;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.3s, border-color 0.3s;
 }
 
-.card:hover { border-color: var(--border-hover); }
+.card:hover { box-shadow: var(--shadow-md); }
 
-/* Section titles inside cards */
 .card h3 {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 1.25rem;
-  letter-spacing: -0.01em;
 }
 
 /* Form elements */
 label {
-  font-size: 0.82rem;
-  font-weight: 500;
+  font-size: 0.84rem;
+  font-weight: 600;
   color: var(--text-secondary);
   display: block;
   margin-bottom: 0.4rem;
-  letter-spacing: 0.02em;
 }
 
 .hint {
@@ -119,18 +121,15 @@ input[type="text"], input[type="password"], input[type="number"], textarea, sele
   font-family: 'Inter', sans-serif;
   background: var(--input-bg);
   color: var(--text);
-  transition: all 0.25s;
+  transition: all 0.2s;
 }
 
-input::placeholder, textarea::placeholder {
-  color: var(--muted);
-}
+input::placeholder, textarea::placeholder { color: #b0bac8; }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-  background: rgba(255,255,255,0.07);
+  box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
 }
 
 textarea { resize: vertical; min-height: 80px; }
@@ -140,54 +139,55 @@ textarea { resize: vertical; min-height: 80px; }
 
 /* Buttons */
 button {
-  padding: 0.7rem 1.75rem;
+  padding: 0.75rem 1.75rem;
   border: none;
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.25s;
+  transition: all 0.2s;
   font-family: 'Inter', sans-serif;
-  letter-spacing: 0.01em;
 }
-button:disabled { opacity: 0.35; cursor: not-allowed; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 2px 12px var(--accent-glow);
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-hover);
-  box-shadow: 0 4px 20px var(--accent-glow);
+  box-shadow: 0 4px 14px rgba(26,86,219,0.25);
   transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: rgba(255,255,255,0.06);
+  background: #f1f5f9;
   color: var(--text-secondary);
   border: 1px solid var(--border);
 }
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(255,255,255,0.1);
+  background: #e8eef6;
   border-color: var(--border-hover);
-  color: var(--text);
 }
 
 .btn-green {
-  background: var(--green);
-  color: #0a0a0f;
-  box-shadow: 0 2px 12px var(--green-glow);
+  background: var(--accent);
+  color: #fff;
+  width: 100%;
+  padding: 0.9rem;
+  font-size: 0.95rem;
+  border-radius: var(--radius-sm);
 }
 .btn-green:hover:not(:disabled) {
-  box-shadow: 0 4px 20px var(--green-glow);
+  background: var(--accent-hover);
+  box-shadow: 0 4px 14px rgba(26,86,219,0.25);
   transform: translateY(-1px);
 }
 
 .btn-outline {
   background: transparent;
   border: 1px solid var(--border);
-  color: var(--text-secondary);
+  color: var(--muted);
 }
 .btn-outline:hover:not(:disabled) {
   border-color: var(--accent);
@@ -196,15 +196,14 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 .btn-row { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
 .btn-row-right { justify-content: flex-end; }
-
 .btn-sm { padding: 0.5rem 1rem; font-size: 0.82rem; }
 
 /* Screen management */
-.screen { display: none; animation: fadeIn 0.4s ease; }
+.screen { display: none; animation: fadeIn 0.35s ease; }
 .screen.active { display: block; }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -212,49 +211,35 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 .style-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 0.85rem;
   margin-top: 0.75rem;
 }
 
 .style-card {
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   text-align: left;
   background: var(--card);
-  position: relative;
-  overflow: hidden;
-}
-
-.style-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius);
-  background: linear-gradient(135deg, transparent, rgba(139,124,246,0.05));
-  opacity: 0;
-  transition: opacity 0.3s;
 }
 
 .style-card:hover {
   border-color: var(--border-hover);
-  background: var(--card-hover);
+  box-shadow: var(--shadow-md);
 }
-.style-card:hover::before { opacity: 1; }
 
 .style-card.selected {
   border-color: var(--accent);
-  background: rgba(139,124,246,0.08);
-  box-shadow: 0 0 0 1px var(--accent), 0 4px 20px var(--accent-glow);
+  background: var(--accent-light);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .style-card h3 {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.3rem;
   color: var(--text);
 }
 
@@ -262,81 +247,70 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   font-size: 0.8rem;
   color: var(--muted);
   line-height: 1.45;
-  position: relative;
 }
 
 .style-card .style-tag {
   display: inline-block;
   font-size: 0.68rem;
   font-weight: 600;
-  background: rgba(255,255,255,0.06);
-  color: var(--text-secondary);
+  background: #f1f5f9;
+  color: var(--muted);
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  margin-top: 0.65rem;
+  margin-top: 0.6rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  position: relative;
+  letter-spacing: 0.05em;
 }
 .style-card.selected .style-tag {
-  background: rgba(139,124,246,0.15);
-  color: var(--accent-hover);
+  background: rgba(26,86,219,0.1);
+  color: var(--accent);
 }
 
 /* Path cards */
-.path-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.85rem;
-}
+.path-grid { display: grid; grid-template-columns: 1fr; gap: 0.75rem; }
 
 .path-card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 1.5rem;
+  padding: 1.35rem 1.5rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   display: flex;
   align-items: flex-start;
-  gap: 1.15rem;
+  gap: 1rem;
   background: var(--card);
+  box-shadow: var(--shadow-sm);
 }
 
 .path-card:hover {
   border-color: var(--border-hover);
-  background: var(--card-hover);
+  box-shadow: var(--shadow-md);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 
 .path-card .path-icon {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   flex-shrink: 0;
-  margin-top: 2px;
   width: 44px;
   height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: rgba(255,255,255,0.04);
+  background: var(--accent-light);
 }
 
 .path-card h3 {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.25rem;
   color: var(--text);
 }
 
 .path-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
 
 /* Interview mode */
-.interview-question {
-  text-align: center;
-  padding: 1.5rem 0;
-}
+.interview-question { text-align: center; padding: 1.5rem 0; }
 
 .interview-question .q-number {
   font-size: 0.72rem;
@@ -351,8 +325,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.6rem;
   line-height: 1.4;
+  color: var(--text);
 }
 
 .interview-question .q-hint {
@@ -364,52 +339,68 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   margin-right: auto;
 }
 
-.interview-question textarea { min-height: 110px; }
+.interview-question textarea { min-height: 110px; text-align: left; }
 
 .progress-bar {
-  height: 2px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 1px;
+  height: 3px;
+  background: #e1e7ef;
+  border-radius: 2px;
   margin-bottom: 2rem;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--green));
-  border-radius: 1px;
+  background: var(--accent);
+  border-radius: 2px;
   transition: width 0.4s ease;
+}
+
+/* Option cards for comment question */
+.option-grid { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+
+.option-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: left;
+  background: var(--card);
+}
+.option-card:hover { border-color: var(--border-hover); }
+.option-card.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent);
+  font-weight: 500;
 }
 
 /* Upload area */
 .upload-area {
-  border: 1px dashed rgba(255,255,255,0.15);
+  border: 2px dashed #c8d2e0;
   border-radius: var(--radius);
   padding: 2.5rem 2rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   margin-bottom: 1rem;
-  background: rgba(255,255,255,0.02);
+  background: #fafbfd;
 }
 
-.upload-area:hover {
-  border-color: var(--accent);
-  background: rgba(139,124,246,0.04);
-}
-.upload-area.dragover {
-  border-color: var(--accent);
-  background: rgba(139,124,246,0.08);
-  box-shadow: 0 0 30px var(--accent-glow);
-}
-.upload-area .upload-icon { font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.7; }
+.upload-area:hover { border-color: var(--accent); background: var(--accent-light); }
+.upload-area.dragover { border-color: var(--accent); background: var(--accent-light); }
+.upload-area .upload-icon { font-size: 1.75rem; margin-bottom: 0.75rem; opacity: 0.5; }
 .upload-area p { color: var(--muted); font-size: 0.88rem; }
-.upload-area .file-name { font-weight: 600; color: var(--green); margin-top: 0.65rem; }
+.upload-area p a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.upload-area .file-name { font-weight: 600; color: var(--accent); margin-top: 0.6rem; }
 
 .or-divider {
   text-align: center;
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   margin: 1.25rem 0;
   position: relative;
   text-transform: uppercase;
@@ -446,17 +437,13 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   40% { transform: scale(1); opacity: 1; }
 }
 
-.loading-text {
-  margin-top: 1.25rem;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
+.loading-text { margin-top: 1.25rem; color: var(--muted); font-size: 0.9rem; }
 
 /* Error */
 .error {
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.2);
-  color: #f87171;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
   padding: 0.85rem 1.15rem;
   border-radius: var(--radius-sm);
   margin-bottom: 1.25rem;
@@ -467,7 +454,7 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* Output */
 .output-editable {
-  background: rgba(255,255,255,0.04);
+  background: #fff;
   border: 1px solid var(--input-border);
   border-radius: var(--radius);
   padding: 1.75rem;
@@ -477,13 +464,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   min-height: 220px;
   outline: none;
   color: var(--text);
-  transition: all 0.25s;
+  transition: all 0.2s;
 }
 
 .output-editable:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-  background: rgba(255,255,255,0.06);
+  box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
 }
 
 .char-count {
@@ -493,10 +479,9 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   margin-top: 0.6rem;
   font-variant-numeric: tabular-nums;
 }
+.char-count.over { color: #dc2626; font-weight: 600; }
 
-.char-count.over { color: #f87171; font-weight: 600; }
-
-/* Tabs for upload */
+/* Tabs */
 .tab-row {
   display: flex;
   gap: 0;
@@ -517,48 +502,33 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
   font-family: 'Inter', sans-serif;
   transition: all 0.2s;
 }
-
 .tab-btn:hover { color: var(--text-secondary); }
-
-.tab-btn.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* Success toast */
+/* Toast */
 .toast {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(20px);
-  color: var(--text);
+  background: var(--text);
+  color: #fff;
   padding: 0.85rem 1.5rem;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
   font-size: 0.88rem;
   opacity: 0;
   transform: translateY(10px);
   transition: all 0.3s;
   z-index: 100;
 }
-
 .toast.show { opacity: 1; transform: translateY(0); }
-
-/* Divider line */
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 0.5rem 0 1.5rem;
-}
 
 /* Responsive */
 @media (max-width: 640px) {
   .container { padding: 1.5rem 1rem; }
-  h1 { font-size: 1.65rem; }
+  h1 { font-size: 1.75rem; }
   .style-grid { grid-template-columns: 1fr; }
   .card { padding: 1.5rem; }
   .interview-question .q-text { font-size: 1.1rem; }
@@ -569,8 +539,8 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
 
 <div class="container">
   <div class="header">
-    <h1>Let Me Re-Introduce Myself</h1>
-    <p class="subtitle">Write a LinkedIn intro post that makes people feel like they know you</p>
+    <h1>Write a LinkedIn Post That<br>Makes You <em>Unforgettable</em></h1>
+    <p class="subtitle">Answer a few questions and get a ready-to-paste "Let me re-introduce myself" post — human, warm, and uniquely you.</p>
   </div>
 
   <div class="error" id="error"></div>
@@ -742,9 +712,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
         </div>
 
         <div class="form-group">
-          <label for="up-question">What question do you want people to answer in the comments?</label>
-          <p class="hint">Make it personal and easy — not about your niche, but something that creates real conversation</p>
-          <input type="text" id="up-question" placeholder="e.g. What's the weirdest job you had before your current one?">
+          <label>Pick a comment question for your audience</label>
+          <p class="hint">We'll generate 3 options based on your answers. Pick the one that feels most you.</p>
+          <button class="btn-secondary btn-sm" onclick="genUploadQOptions()" id="upQBtn" style="margin-bottom:0.75rem">Generate options</button>
+          <div class="option-grid" id="up-question-options">
+            <div class="option-card" style="color:var(--muted);font-style:italic;border-style:dashed;cursor:default">Click "Generate options" above after filling in the fields</div>
+          </div>
         </div>
 
         <div class="btn-row btn-row-right">
@@ -854,8 +827,12 @@ button:disabled { opacity: 0.35; cursor: not-allowed; }
       </div>
 
       <div class="form-group">
-        <label for="f-question">What question do you want people to answer in the comments?</label>
-        <input type="text" id="f-question" placeholder="Something personal and easy that creates real conversation">
+        <label>Pick a comment question for your audience</label>
+        <p class="hint">We'll generate 3 options based on your answers</p>
+        <button class="btn-secondary btn-sm" onclick="genFormQOptions()" id="fQBtn" style="margin-bottom:0.75rem">Generate options</button>
+        <div class="option-grid" id="f-question-options">
+          <div class="option-card" style="color:var(--muted);font-style:italic;border-style:dashed;cursor:default">Click "Generate options" above after filling in the fields</div>
+        </div>
       </div>
     </div>
 
@@ -923,7 +900,7 @@ const INTERVIEW_QS = [
   { key: 'culture', text: 'Is there a cultural or background detail that shaped who you are?', hint: 'Where you grew up, a tradition, a mindset you inherited', placeholder: "e.g. I grew up as the middle child — communication and negotiation skills are 10/10", type: 'textarea' },
   { key: 'cares', text: 'What do you care about that has nothing to do with your career?', hint: 'Family, cause, obsession, fear, dream — what drives you when no one is watching', placeholder: 'e.g. Being a dad. My son is my everything.', type: 'textarea' },
   { key: 'vulnerable', text: "What's one thing about your journey that was genuinely hard — that you're now okay sharing?", hint: "This is the detail that makes people trust you", placeholder: "e.g. I went broke twice before 30 and almost gave up", type: 'textarea' },
-  { key: 'question', text: "What question do you want people to answer in the comments?", hint: "Make it personal and easy — not about your niche, but something that creates real conversation", placeholder: "e.g. What's the weirdest job you had before your current one?", type: 'input' },
+  { key: 'question', text: "Pick a comment question for your audience", hint: "We'll generate 3 options based on your previous answers — pick the one that feels most you", placeholder: "", type: 'options' },
 ];
 
 let interviewIdx = 0;
@@ -1038,7 +1015,7 @@ async function processUpload() {
 // ===========================
 // Interview path
 // ===========================
-function renderInterviewQ() {
+async function renderInterviewQ() {
   const q = INTERVIEW_QS[interviewIdx];
   const total = INTERVIEW_QS.length;
   const pct = ((interviewIdx) / total) * 100;
@@ -1046,28 +1023,114 @@ function renderInterviewQ() {
 
   const container = document.getElementById('interviewQ');
   const prev = interviewAnswers[q.key] || '';
-  const inputEl = q.type === 'textarea'
-    ? `<textarea id="iv-answer" placeholder="${esc(q.placeholder)}">${esc(prev)}</textarea>`
-    : `<input type="text" id="iv-answer" placeholder="${esc(q.placeholder)}" value="${esc(prev)}">`;
 
-  container.innerHTML = `
-    <div class="q-number">Question ${interviewIdx + 1} of ${total}</div>
-    <div class="q-text">${esc(q.text)}</div>
-    <div class="q-hint">${esc(q.hint)}</div>
-    ${inputEl}
-  `;
+  if (q.type === 'options') {
+    container.innerHTML = `
+      <div class="q-number">Question ${interviewIdx + 1} of ${total}</div>
+      <div class="q-text">${esc(q.text)}</div>
+      <div class="q-hint">${esc(q.hint)}</div>
+      <div class="option-grid" id="iv-options">
+        <div class="option-card" style="color:var(--muted);font-style:italic;border-style:dashed;cursor:default">Generating options based on your answers...</div>
+      </div>
+    `;
+    document.getElementById('interviewNextBtn').disabled = true;
+    const options = await generateQuestionOptions(interviewAnswers);
+    renderOptionCards('iv-options', options, prev);
+    document.getElementById('interviewNextBtn').disabled = false;
+  } else {
+    const inputEl = q.type === 'textarea'
+      ? `<textarea id="iv-answer" placeholder="${esc(q.placeholder)}">${esc(prev)}</textarea>`
+      : `<input type="text" id="iv-answer" placeholder="${esc(q.placeholder)}" value="${esc(prev)}">`;
+
+    container.innerHTML = `
+      <div class="q-number">Question ${interviewIdx + 1} of ${total}</div>
+      <div class="q-text">${esc(q.text)}</div>
+      <div class="q-hint">${esc(q.hint)}</div>
+      ${inputEl}
+    `;
+    setTimeout(() => document.getElementById('iv-answer').focus(), 100);
+  }
 
   document.getElementById('interviewBackBtn').style.visibility = interviewIdx === 0 ? 'hidden' : 'visible';
   document.getElementById('interviewNextBtn').textContent = interviewIdx === total - 1 ? 'Generate my post' : 'Next';
+}
 
-  // Focus
-  setTimeout(() => document.getElementById('iv-answer').focus(), 100);
+// Generate 3 comment question options from context
+async function generateQuestionOptions(data) {
+  const context = Object.entries(data).filter(([k,v]) => v).map(([k,v]) => `${k}: ${v}`).join('\n');
+  try {
+    const result = await callClaude(
+      'You generate comment questions for LinkedIn posts. Return ONLY a JSON array of exactly 3 strings. Each should be a personal, fun, easy-to-answer question that sparks real conversation. Not about business/niche — about life, personality, experiences. Keep each under 80 characters. No numbering, no quotes around the array items beyond JSON syntax.',
+      `Based on this person's details, suggest 3 comment questions:\n\n${context}`
+    );
+    const cleaned = result.replace(/```json?\s*/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch (e) {
+    return [
+      "What's the most surprising career change you've ever made?",
+      "What's one thing about you that doesn't match your job title?",
+      "What did 10-year-old you want to be when you grew up?"
+    ];
+  }
+}
+
+let selectedQuestion = '';
+
+function renderOptionCards(containerId, options, preselected) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = options.map((opt, i) =>
+    `<div class="option-card${preselected === opt ? ' selected' : ''}" onclick="selectOption(this, '${containerId}')">${esc(opt)}</div>`
+  ).join('');
+}
+
+function selectOption(el, containerId) {
+  const parent = document.getElementById(containerId);
+  parent.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedQuestion = el.textContent;
+}
+
+async function genUploadQOptions() {
+  const btn = document.getElementById('upQBtn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  const data = {
+    context: extractedContext,
+    surprise: document.getElementById('up-surprise').value,
+    quirk: document.getElementById('up-quirk').value,
+    good: document.getElementById('up-good').value,
+    food: document.getElementById('up-food').value,
+    cares: document.getElementById('up-cares').value,
+  };
+  const options = await generateQuestionOptions(data);
+  renderOptionCards('up-question-options', options, '');
+  btn.disabled = false; btn.textContent = 'Regenerate options';
+}
+
+async function genFormQOptions() {
+  const btn = document.getElementById('fQBtn');
+  btn.disabled = true; btn.textContent = 'Generating...';
+  const data = {
+    name: document.getElementById('f-name').value,
+    role: document.getElementById('f-role').value,
+    before: document.getElementById('f-before').value,
+    quirk: document.getElementById('f-quirk').value,
+    good: document.getElementById('f-good').value,
+    food: document.getElementById('f-food').value,
+    cares: document.getElementById('f-cares').value,
+  };
+  const options = await generateQuestionOptions(data);
+  renderOptionCards('f-question-options', options, '');
+  btn.disabled = false; btn.textContent = 'Regenerate options';
 }
 
 function interviewNext() {
   const q = INTERVIEW_QS[interviewIdx];
-  const val = document.getElementById('iv-answer').value.trim();
-  interviewAnswers[q.key] = val;
+  if (q.type === 'options') {
+    interviewAnswers[q.key] = selectedQuestion;
+  } else {
+    const val = document.getElementById('iv-answer').value.trim();
+    interviewAnswers[q.key] = val;
+  }
 
   if (interviewIdx < INTERVIEW_QS.length - 1) {
     interviewIdx++;
@@ -1080,7 +1143,11 @@ function interviewNext() {
 function interviewPrev() {
   if (interviewIdx > 0) {
     const q = INTERVIEW_QS[interviewIdx];
-    interviewAnswers[q.key] = document.getElementById('iv-answer').value.trim();
+    if (q.type === 'options') {
+      interviewAnswers[q.key] = selectedQuestion;
+    } else {
+      interviewAnswers[q.key] = document.getElementById('iv-answer').value.trim();
+    }
     interviewIdx--;
     renderInterviewQ();
   }
@@ -1090,6 +1157,7 @@ function interviewPrev() {
 // Collect input data
 // ===========================
 function collectUploadData() {
+  const sel = document.querySelector('#up-question-options .option-card.selected');
   return {
     extractedContext,
     hook: document.getElementById('up-hook').value.trim(),
@@ -1101,11 +1169,12 @@ function collectUploadData() {
     quirk: document.getElementById('up-quirk').value.trim(),
     cares: document.getElementById('up-cares').value.trim(),
     vulnerable: document.getElementById('up-vulnerable').value.trim(),
-    question: document.getElementById('up-question').value.trim(),
+    question: sel ? sel.textContent : '',
   };
 }
 
 function collectFormData() {
+  const sel = document.querySelector('#f-question-options .option-card.selected');
   return {
     name: document.getElementById('f-name').value.trim(),
     role: document.getElementById('f-role').value.trim(),
@@ -1120,7 +1189,7 @@ function collectFormData() {
     culture: document.getElementById('f-culture').value.trim(),
     cares: document.getElementById('f-cares').value.trim(),
     vulnerable: document.getElementById('f-vulnerable').value.trim(),
-    question: document.getElementById('f-question').value.trim(),
+    question: sel ? sel.textContent : '',
   };
 }
 
