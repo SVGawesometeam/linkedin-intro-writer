@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Let Me Re-Introduce Myself — LinkedIn Post Writer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #1a1a2e;
+  --muted: #64748b;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --green: #16a34a;
+  --green-hover: #15803d;
+  --radius: 12px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Header */
+h1 { font-size: 1.75rem; font-weight: 700; text-align: center; margin-bottom: 0.25rem; }
+.subtitle { text-align: center; color: var(--muted); margin-bottom: 2rem; font-size: 1rem; }
+
+/* Cards */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Form elements */
+label { font-size: 0.85rem; font-weight: 600; color: #334155; display: block; margin-bottom: 0.35rem; }
+.hint { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.5rem; }
+
+input[type="text"], input[type="password"], input[type="number"], textarea, select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+}
+
+textarea { resize: vertical; min-height: 80px; }
+
+.form-group { margin-bottom: 1.25rem; }
+.form-group:last-child { margin-bottom: 0; }
+
+/* Buttons */
+button {
+  padding: 0.65rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn-secondary { background: #e2e8f0; color: #334155; }
+.btn-secondary:hover:not(:disabled) { background: #cbd5e1; }
+
+.btn-green { background: var(--green); color: #fff; }
+.btn-green:hover:not(:disabled) { background: var(--green-hover); }
+
+.btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+
+.btn-row { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+.btn-row-right { justify-content: flex-end; }
+
+.btn-sm { padding: 0.45rem 1rem; font-size: 0.85rem; }
+
+/* Screen management */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* Style cards */
+.style-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.style-card {
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.style-card:hover { border-color: #94a3b8; }
+.style-card.selected { border-color: var(--accent); background: #eff6ff; }
+
+.style-card h3 { font-size: 0.95rem; margin-bottom: 0.25rem; }
+.style-card p { font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
+.style-card .style-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  margin-top: 0.5rem;
+}
+.style-card.selected .style-tag { background: #dbeafe; color: var(--accent); }
+
+/* Path cards */
+.path-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.path-card {
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.path-card:hover { border-color: #94a3b8; }
+.path-card .path-icon { font-size: 1.5rem; flex-shrink: 0; margin-top: 2px; }
+.path-card h3 { font-size: 1rem; margin-bottom: 0.2rem; }
+.path-card p { font-size: 0.85rem; color: var(--muted); }
+
+/* Interview mode */
+.interview-question {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.interview-question .q-number {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.interview-question .q-text {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.interview-question .q-hint {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.interview-question textarea {
+  min-height: 100px;
+}
+
+.progress-bar {
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+
+/* Upload area */
+.upload-area {
+  border: 2px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 1rem;
+}
+
+.upload-area:hover { border-color: var(--accent); background: #f8fafc; }
+.upload-area.dragover { border-color: var(--accent); background: #eff6ff; }
+.upload-area .upload-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.upload-area p { color: var(--muted); font-size: 0.9rem; }
+.upload-area .file-name { font-weight: 600; color: var(--green); margin-top: 0.5rem; }
+
+.or-divider {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 1rem 0;
+  position: relative;
+}
+.or-divider::before, .or-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: var(--border);
+}
+.or-divider::before { left: 0; }
+.or-divider::after { right: 0; }
+
+/* Loading */
+.loading { text-align: center; padding: 2rem; display: none; }
+.loading.active { display: block; }
+
+.dots span {
+  display: inline-block;
+  width: 10px; height: 10px;
+  margin: 0 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+.dots span:nth-child(1) { animation-delay: -0.32s; }
+.dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+.loading-text { margin-top: 1rem; color: var(--muted); font-size: 0.95rem; }
+
+/* Error */
+.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: none;
+  font-size: 0.9rem;
+}
+.error.active { display: block; }
+
+/* Output */
+.output-area {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  white-space: pre-wrap;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  min-height: 200px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.output-editable {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  white-space: pre-wrap;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  min-height: 200px;
+  outline: none;
+}
+
+.output-editable:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+}
+
+.char-count {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+.char-count.over { color: #dc2626; font-weight: 600; }
+
+/* Tabs for upload */
+.tab-row {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.tab-btn {
+  padding: 0.5rem 1.25rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Success toast */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #1a1a2e;
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+  z-index: 100;
+}
+
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container { padding: 1rem; }
+  h1 { font-size: 1.35rem; }
+  .style-grid { grid-template-columns: 1fr; }
+  .card { padding: 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Let Me Re-Introduce Myself</h1>
+  <p class="subtitle">Write a LinkedIn intro post that makes people feel like they know you</p>
+
+  <div class="error" id="error"></div>
+
+  <!-- ========== SCREEN 1: STYLE SELECTION ========== -->
+  <div class="screen active" id="screen-style">
+    <div class="card">
+      <label>Choose your writing style</label>
+      <p class="hint">This sets the overall structure and tone of your post</p>
+
+      <div class="style-grid">
+        <div class="style-card" data-style="numbered" onclick="selectStyle(this)">
+          <h3>Numbered Facts</h3>
+          <p>Clean, scannable list with emoji bullets. Quick, fun, easy to read.</p>
+          <span class="style-tag">Light & professional</span>
+        </div>
+
+        <div class="style-card" data-style="narrative" onclick="selectStyle(this)">
+          <h3>Personal Narrative</h3>
+          <p>Flowing story with personality, humor, and unexpected contrasts.</p>
+          <span class="style-tag">Deep & personal</span>
+        </div>
+
+        <div class="style-card" data-style="authority" onclick="selectStyle(this)">
+          <h3>Authority + Heart</h3>
+          <p>Lead with credibility and numbers, then reveal the human side.</p>
+          <span class="style-tag">Impressive & warm</span>
+        </div>
+
+        <div class="style-card" data-style="letter" onclick="selectStyle(this)">
+          <h3>Letter to a Friend</h3>
+          <p>No structure, just a warm conversational letter. Like talking to someone you just met and liked.</p>
+          <span class="style-tag">Intimate & honest</span>
+        </div>
+      </div>
+
+      <div class="btn-row btn-row-right">
+        <button class="btn-primary" id="styleNextBtn" disabled onclick="goToPath()">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SCREEN 2: CHOOSE INPUT PATH ========== -->
+  <div class="screen" id="screen-path">
+    <div class="card">
+      <label>How do you want to provide your info?</label>
+      <p class="hint">All paths generate the same quality post — pick what's easiest for you</p>
+
+      <div class="path-grid">
+        <div class="path-card" onclick="choosePath('upload')">
+          <span class="path-icon">📄</span>
+          <div>
+            <h3>Upload context + answer personal questions</h3>
+            <p>Upload your CV, LinkedIn export, or paste your bio. We'll extract the professional stuff automatically, then ask only the fun personal questions.</p>
+          </div>
+        </div>
+
+        <div class="path-card" onclick="choosePath('interview')">
+          <span class="path-icon">💬</span>
+          <div>
+            <h3>Interview me — one question at a time</h3>
+            <p>Like a conversation. We'll ask you one thing at a time. Feels lighter and you'll write more honestly.</p>
+          </div>
+        </div>
+
+        <div class="path-card" onclick="choosePath('form')">
+          <span class="path-icon">📋</span>
+          <div>
+            <h3>I'll fill out the full form</h3>
+            <p>See all the questions at once. Best if you already know exactly what you want to say.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-outline btn-sm" onclick="showScreen('screen-style')">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SCREEN 3A: UPLOAD PATH ========== -->
+  <div class="screen" id="screen-upload">
+    <div class="card">
+      <label>Share your professional context</label>
+      <p class="hint">We'll extract your name, role, career history, and key facts automatically</p>
+
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('upload-file', this)">Upload file</button>
+        <button class="tab-btn" onclick="switchTab('upload-paste', this)">Paste text</button>
+      </div>
+
+      <div class="tab-content active" id="tab-upload-file">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📎</div>
+          <p>Drop your CV, resume, or LinkedIn PDF here<br>or click to browse</p>
+          <p class="file-name" id="fileName" style="display:none"></p>
+          <input type="file" id="fileInput" accept=".pdf,.txt,.doc,.docx" style="display:none">
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-upload-paste">
+        <div class="form-group">
+          <textarea id="pasteText" rows="8" placeholder="Paste your LinkedIn About section, bio, resume text, or anything that describes your professional background..."></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-outline btn-sm" onclick="showScreen('screen-path')">Back</button>
+        <button class="btn-primary" onclick="processUpload()">Extract & continue</button>
+      </div>
+    </div>
+
+    <!-- Loading for extraction -->
+    <div class="loading" id="extractLoading">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <div class="loading-text">Reading your background and extracting key details...</div>
+    </div>
+
+    <!-- After extraction: personal questions only -->
+    <div id="uploadPersonalQs" style="display:none">
+      <div class="card">
+        <label>Great, we got the professional stuff. Now the fun part.</label>
+        <p class="hint">These personal details are what make the post interesting</p>
+
+        <div class="form-group">
+          <label for="up-hook">How many new followers/connections did you get recently?</label>
+          <input type="text" id="up-hook" placeholder="e.g. 2,000 new connections this month">
+        </div>
+
+        <div class="form-group">
+          <label for="up-surprise">What did you do before your current work that would surprise people?</label>
+          <p class="hint">Previous careers, side projects, obsessions, failures — the weirder, the better</p>
+          <textarea id="up-surprise" placeholder="e.g. I was a competitive chess player and a wedding DJ before I got into tech"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="up-pivot">Was there one moment or decision that changed your path?</label>
+          <textarea id="up-pivot" placeholder="e.g. I quit my corporate job the day my boss told me 'that's not how we do things here' for the 100th time"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="up-good">One thing you're irrationally good at (not work-related)</label>
+          <input type="text" id="up-good" placeholder="e.g. Parallel parking in impossibly tight spots">
+        </div>
+
+        <div class="form-group">
+          <label for="up-bad">One thing you're embarrassingly bad at</label>
+          <input type="text" id="up-bad" placeholder="e.g. Keeping plants alive">
+        </div>
+
+        <div class="form-group">
+          <label for="up-food">Food you love / food you hate</label>
+          <input type="text" id="up-food" placeholder="e.g. I'd eat sushi every day / can't stand celery">
+        </div>
+
+        <div class="form-group">
+          <label for="up-quirk">A quirk or habit people who know you would recognize</label>
+          <input type="text" id="up-quirk" placeholder="e.g. I narrate what I'm cooking like it's a cooking show">
+        </div>
+
+        <div class="form-group">
+          <label for="up-cares">What do you care about that isn't your career?</label>
+          <textarea id="up-cares" placeholder="e.g. My daughter's laugh, ocean conservation, making sure my mom knows she did a good job raising me"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="up-vulnerable">One thing about your journey that was genuinely hard — that you're now okay sharing</label>
+          <textarea id="up-vulnerable" placeholder="e.g. I went broke twice before age 30 and almost gave up on entrepreneurship entirely"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="up-question">What question do you want people to answer in the comments?</label>
+          <p class="hint">Make it personal and easy — not about your niche, but something that creates real conversation</p>
+          <input type="text" id="up-question" placeholder="e.g. What's the weirdest job you had before your current one?">
+        </div>
+
+        <div class="btn-row btn-row-right">
+          <button class="btn-green" onclick="generateFromUpload()">Generate my post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SCREEN 3B: INTERVIEW PATH ========== -->
+  <div class="screen" id="screen-interview">
+    <div class="card">
+      <div class="progress-bar"><div class="progress-fill" id="interviewProgress" style="width:0%"></div></div>
+
+      <div class="interview-question" id="interviewQ">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div class="btn-row" style="justify-content:space-between">
+        <button class="btn-outline btn-sm" id="interviewBackBtn" onclick="interviewPrev()">Back</button>
+        <button class="btn-primary" id="interviewNextBtn" onclick="interviewNext()">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SCREEN 3C: FORM PATH ========== -->
+  <div class="screen" id="screen-form">
+    <div class="card">
+      <label style="font-size:1.1rem; margin-bottom:0.25rem">The full picture</label>
+      <p class="hint">Fill in as much as you can. The more detail, the better the post.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:1rem; font-size:1rem">The basics</h3>
+
+      <div class="form-group">
+        <label for="f-name">Your name</label>
+        <input type="text" id="f-name" placeholder="e.g. Jasmin Alic">
+      </div>
+
+      <div class="form-group">
+        <label for="f-role">What you do — in one plain sentence</label>
+        <input type="text" id="f-role" placeholder="e.g. I help people build personal brands on LinkedIn">
+      </div>
+
+      <div class="form-group">
+        <label for="f-location">Where you're from and where you live now</label>
+        <input type="text" id="f-location" placeholder="e.g. Born in Bosnia, living in Sarajevo">
+      </div>
+
+      <div class="form-group">
+        <label for="f-hook">How many new followers/connections recently? (this is the reason for the post)</label>
+        <input type="text" id="f-hook" placeholder="e.g. 5,000 new connections this quarter">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:1rem; font-size:1rem">Your story</h3>
+
+      <div class="form-group">
+        <label for="f-before">What did you do before your current work that would surprise people?</label>
+        <textarea id="f-before" placeholder="Previous careers, side projects, obsessions — the weirder the better"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="f-pivot">The pivot moment — one specific decision or realization that changed your path</label>
+        <textarea id="f-pivot" placeholder="What happened, and when?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="f-vulnerable">One genuinely hard, embarrassing, or uncertain thing about your journey</label>
+        <textarea id="f-vulnerable" placeholder="The detail that makes people trust you"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:1rem; font-size:1rem">The human side</h3>
+
+      <div class="form-group">
+        <label for="f-good">Irrationally good at (not work-related)</label>
+        <input type="text" id="f-good" placeholder="e.g. Making the perfect scrambled eggs">
+      </div>
+
+      <div class="form-group">
+        <label for="f-bad">Embarrassingly bad at</label>
+        <input type="text" id="f-bad" placeholder="e.g. Remembering people's names">
+      </div>
+
+      <div class="form-group">
+        <label for="f-food">Food love / food hate</label>
+        <input type="text" id="f-food" placeholder="e.g. Burgers forever / onions never">
+      </div>
+
+      <div class="form-group">
+        <label for="f-quirk">A quirk people who know you would recognize</label>
+        <input type="text" id="f-quirk" placeholder="e.g. I quote entire Suits episodes">
+      </div>
+
+      <div class="form-group">
+        <label for="f-culture">Cultural or background detail that shaped you</label>
+        <textarea id="f-culture" placeholder="Where you grew up, how it shaped your thinking"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="f-cares">What you care about beyond your career</label>
+        <textarea id="f-cares" placeholder="Family, cause, obsession, fear, dream"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="f-question">What question do you want people to answer in the comments?</label>
+        <input type="text" id="f-question" placeholder="Something personal and easy that creates real conversation">
+      </div>
+    </div>
+
+    <div class="btn-row" style="justify-content:space-between">
+      <button class="btn-outline btn-sm" onclick="showScreen('screen-path')">Back</button>
+      <button class="btn-green" onclick="generateFromForm()">Generate my post</button>
+    </div>
+  </div>
+
+  <!-- ========== SCREEN 4: GENERATING ========== -->
+  <div class="screen" id="screen-generating">
+    <div class="card" style="text-align:center; padding:3rem">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <div class="loading-text" id="genLoadingText" style="margin-top:1.5rem">
+        Writing your post... this takes about 30 seconds
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SCREEN 5: OUTPUT ========== -->
+  <div class="screen" id="screen-output">
+    <div class="card">
+      <label style="font-size:1.1rem; margin-bottom:0.5rem">Your post is ready</label>
+      <p class="hint">Edit directly below, then copy when you're happy with it</p>
+
+      <div class="output-editable" id="outputText" contenteditable="true" oninput="updateCharCount()"></div>
+      <div class="char-count" id="charCount"></div>
+
+      <div class="btn-row" style="justify-content:space-between; flex-wrap:wrap">
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap">
+          <button class="btn-primary" onclick="copyOutput()">Copy to clipboard</button>
+          <button class="btn-outline btn-sm" onclick="regenerate()">Regenerate</button>
+        </div>
+        <button class="btn-secondary btn-sm" onclick="startOver()">Start over</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ===========================
+// State
+// ===========================
+let selectedStyle = null;
+let extractedContext = '';
+let lastInputData = {};
+
+// ===========================
+// Interview questions
+// ===========================
+const INTERVIEW_QS = [
+  { key: 'name', text: "What's your name?", hint: 'Just your first and last name', placeholder: 'e.g. Sofia Kuznetsova', type: 'input' },
+  { key: 'role', text: 'What do you do? In one plain sentence.', hint: 'Describe it so a non-professional would get it', placeholder: "e.g. I help people get noticed on LinkedIn", type: 'input' },
+  { key: 'location', text: "Where are you from and where do you live now?", hint: 'City, country — whatever feels right', placeholder: 'e.g. Russian, living in Abu Dhabi', type: 'input' },
+  { key: 'hook', text: 'How many new followers or connections have you gotten recently?', hint: "This is the honest reason for the post — it's a natural opening", placeholder: 'e.g. 2,000 new connections this month', type: 'input' },
+  { key: 'before', text: 'What did you do before your current work that would genuinely surprise people?', hint: 'Previous careers, side projects, obsessions, failures — the weirder or more contrasting, the better', placeholder: "e.g. I was a rapper with 6 albums, then a teacher, then a copywriter...", type: 'textarea' },
+  { key: 'pivot', text: 'Was there one specific moment or decision that changed your path?', hint: 'What happened, and when?', placeholder: "e.g. I saved $100K by age 25 and quit my corporate job the next day", type: 'textarea' },
+  { key: 'good', text: "What are you irrationally good at? (Not work-related)", hint: 'The weird flex that has nothing to do with your job', placeholder: 'e.g. Parallel parking in impossibly tight spots', type: 'input' },
+  { key: 'bad', text: "What are you embarrassingly bad at?", hint: "Something that makes people laugh", placeholder: 'e.g. Keeping any plant alive for more than 2 weeks', type: 'input' },
+  { key: 'food', text: 'Food you love and food you hate?', hint: 'Be specific — not just "Italian food" but the actual dish', placeholder: "e.g. I'd eat burgers every day / can't stand anything with onions", type: 'input' },
+  { key: 'quirk', text: 'A habit or quirk that people who know you well would immediately recognize?', hint: 'The thing your friends would say: "that is SO you"', placeholder: 'e.g. I can quote every line from all 9 seasons of Suits', type: 'input' },
+  { key: 'culture', text: 'Is there a cultural or background detail that shaped who you are?', hint: 'Where you grew up, a tradition, a mindset you inherited', placeholder: "e.g. I grew up as the middle child — communication and negotiation skills are 10/10", type: 'textarea' },
+  { key: 'cares', text: 'What do you care about that has nothing to do with your career?', hint: 'Family, cause, obsession, fear, dream — what drives you when no one is watching', placeholder: 'e.g. Being a dad. My son is my everything.', type: 'textarea' },
+  { key: 'vulnerable', text: "What's one thing about your journey that was genuinely hard — that you're now okay sharing?", hint: "This is the detail that makes people trust you", placeholder: "e.g. I went broke twice before 30 and almost gave up", type: 'textarea' },
+  { key: 'question', text: "What question do you want people to answer in the comments?", hint: "Make it personal and easy — not about your niche, but something that creates real conversation", placeholder: "e.g. What's the weirdest job you had before your current one?", type: 'input' },
+];
+
+let interviewIdx = 0;
+let interviewAnswers = {};
+
+// On load
+window.addEventListener('DOMContentLoaded', () => {
+  setupUpload();
+});
+
+// ===========================
+// Navigation
+// ===========================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function selectStyle(el) {
+  document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedStyle = el.dataset.style;
+  document.getElementById('styleNextBtn').disabled = false;
+}
+
+function goToPath() {
+  if (!selectedStyle) return;
+  showScreen('screen-path');
+}
+
+function choosePath(path) {
+  if (path === 'upload') showScreen('screen-upload');
+  else if (path === 'interview') { interviewIdx = 0; interviewAnswers = {}; renderInterviewQ(); showScreen('screen-interview'); }
+  else if (path === 'form') showScreen('screen-form');
+}
+
+// ===========================
+// Upload path
+// ===========================
+function setupUpload() {
+  const area = document.getElementById('uploadArea');
+  const inp = document.getElementById('fileInput');
+
+  area.addEventListener('click', () => inp.click());
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
+  area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+  area.addEventListener('drop', e => {
+    e.preventDefault();
+    area.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  inp.addEventListener('change', () => { if (inp.files.length) handleFile(inp.files[0]); });
+}
+
+let uploadedFileText = '';
+
+async function handleFile(file) {
+  const fn = document.getElementById('fileName');
+  fn.textContent = file.name;
+  fn.style.display = 'block';
+
+  if (file.type === 'application/pdf') {
+    try {
+      const arrayBuf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + '\n';
+      }
+      uploadedFileText = text;
+    } catch (e) {
+      showError('Could not read PDF. Try pasting the text instead.');
+    }
+  } else {
+    uploadedFileText = await file.text();
+  }
+}
+
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+async function processUpload() {
+  const text = uploadedFileText || document.getElementById('pasteText').value.trim();
+  if (!text) { showError('Please upload a file or paste your text first.'); return; }
+  hideError();
+
+  const loader = document.getElementById('extractLoading');
+  loader.classList.add('active');
+
+  try {
+    const extracted = await callClaude(
+      'You extract professional information from resumes, CVs, bios, and LinkedIn profiles. Return a clean summary with: Full Name, Current Role/Title, Location, Career History (chronological, brief), Key Achievements/Numbers, Education, Languages, and any other notable professional facts. Be concise. Return plain text, no JSON.',
+      'Extract the professional details from this text:\n\n' + text
+    );
+    extractedContext = extracted;
+    loader.classList.remove('active');
+    document.getElementById('uploadPersonalQs').style.display = 'block';
+    document.getElementById('uploadPersonalQs').scrollIntoView({ behavior: 'smooth' });
+  } catch (e) {
+    loader.classList.remove('active');
+    showError('Extraction failed: ' + e.message);
+  }
+}
+
+// ===========================
+// Interview path
+// ===========================
+function renderInterviewQ() {
+  const q = INTERVIEW_QS[interviewIdx];
+  const total = INTERVIEW_QS.length;
+  const pct = ((interviewIdx) / total) * 100;
+  document.getElementById('interviewProgress').style.width = pct + '%';
+
+  const container = document.getElementById('interviewQ');
+  const prev = interviewAnswers[q.key] || '';
+  const inputEl = q.type === 'textarea'
+    ? `<textarea id="iv-answer" placeholder="${esc(q.placeholder)}">${esc(prev)}</textarea>`
+    : `<input type="text" id="iv-answer" placeholder="${esc(q.placeholder)}" value="${esc(prev)}">`;
+
+  container.innerHTML = `
+    <div class="q-number">Question ${interviewIdx + 1} of ${total}</div>
+    <div class="q-text">${esc(q.text)}</div>
+    <div class="q-hint">${esc(q.hint)}</div>
+    ${inputEl}
+  `;
+
+  document.getElementById('interviewBackBtn').style.visibility = interviewIdx === 0 ? 'hidden' : 'visible';
+  document.getElementById('interviewNextBtn').textContent = interviewIdx === total - 1 ? 'Generate my post' : 'Next';
+
+  // Focus
+  setTimeout(() => document.getElementById('iv-answer').focus(), 100);
+}
+
+function interviewNext() {
+  const q = INTERVIEW_QS[interviewIdx];
+  const val = document.getElementById('iv-answer').value.trim();
+  interviewAnswers[q.key] = val;
+
+  if (interviewIdx < INTERVIEW_QS.length - 1) {
+    interviewIdx++;
+    renderInterviewQ();
+  } else {
+    generateFromInterview();
+  }
+}
+
+function interviewPrev() {
+  if (interviewIdx > 0) {
+    const q = INTERVIEW_QS[interviewIdx];
+    interviewAnswers[q.key] = document.getElementById('iv-answer').value.trim();
+    interviewIdx--;
+    renderInterviewQ();
+  }
+}
+
+// ===========================
+// Collect input data
+// ===========================
+function collectUploadData() {
+  return {
+    extractedContext,
+    hook: document.getElementById('up-hook').value.trim(),
+    before: document.getElementById('up-surprise').value.trim(),
+    pivot: document.getElementById('up-pivot').value.trim(),
+    good: document.getElementById('up-good').value.trim(),
+    bad: document.getElementById('up-bad').value.trim(),
+    food: document.getElementById('up-food').value.trim(),
+    quirk: document.getElementById('up-quirk').value.trim(),
+    cares: document.getElementById('up-cares').value.trim(),
+    vulnerable: document.getElementById('up-vulnerable').value.trim(),
+    question: document.getElementById('up-question').value.trim(),
+  };
+}
+
+function collectFormData() {
+  return {
+    name: document.getElementById('f-name').value.trim(),
+    role: document.getElementById('f-role').value.trim(),
+    location: document.getElementById('f-location').value.trim(),
+    hook: document.getElementById('f-hook').value.trim(),
+    before: document.getElementById('f-before').value.trim(),
+    pivot: document.getElementById('f-pivot').value.trim(),
+    good: document.getElementById('f-good').value.trim(),
+    bad: document.getElementById('f-bad').value.trim(),
+    food: document.getElementById('f-food').value.trim(),
+    quirk: document.getElementById('f-quirk').value.trim(),
+    culture: document.getElementById('f-culture').value.trim(),
+    cares: document.getElementById('f-cares').value.trim(),
+    vulnerable: document.getElementById('f-vulnerable').value.trim(),
+    question: document.getElementById('f-question').value.trim(),
+  };
+}
+
+// ===========================
+// Generate
+// ===========================
+function buildUserPrompt(data) {
+  let parts = [];
+
+  if (data.extractedContext) {
+    parts.push('PROFESSIONAL BACKGROUND (extracted from their CV/bio):\n' + data.extractedContext);
+  }
+  if (data.name) parts.push('Name: ' + data.name);
+  if (data.role) parts.push('What I do: ' + data.role);
+  if (data.location) parts.push('Location: ' + data.location);
+  if (data.hook) parts.push('New followers/connections recently: ' + data.hook);
+  if (data.before) parts.push('Surprising past / before current work: ' + data.before);
+  if (data.pivot) parts.push('The pivot moment: ' + data.pivot);
+  if (data.good) parts.push('Irrationally good at: ' + data.good);
+  if (data.bad) parts.push('Embarrassingly bad at: ' + data.bad);
+  if (data.food) parts.push('Food love/hate: ' + data.food);
+  if (data.quirk) parts.push('Quirk/habit: ' + data.quirk);
+  if (data.culture) parts.push('Cultural/background detail: ' + data.culture);
+  if (data.cares) parts.push('What they care about beyond career: ' + data.cares);
+  if (data.vulnerable) parts.push('Vulnerable/hard detail: ' + data.vulnerable);
+  if (data.question) parts.push('Question for comments: ' + data.question);
+
+  return parts.join('\n\n');
+}
+
+function getStyleInstruction() {
+  const styles = {
+    numbered: `STYLE: "Numbered Facts" — Write a list of numbered or emoji-bulleted facts (like "here are 9 facts about me"). Keep each fact to 1-3 sentences. Use emojis as bullet markers. The list should feel playful, not like a resume. Mix professional facts with personal, fun, and surprising ones. End with a warm invitation to DM or comment.`,
+    narrative: `STYLE: "Personal Narrative" — Write a flowing, personal story. No numbered list. Build contrast between who they were and who they are. Use short punchy paragraphs. Include humor and unexpected reveals. The reader should feel like they're hearing this from a friend at a dinner party. End with warmth and a specific question.`,
+    authority: `STYLE: "Authority + Heart" — Open with a strong credibility statement (followers, achievements, what they're known for). Then break the professional mask and reveal the human underneath. Structure: what people know me for -> what people don't know about me -> what drives me. End with a community welcome.`,
+    letter: `STYLE: "Letter to a Friend" — Write like a personal letter. No structure, no bullets, no headers. Just warmth and honesty flowing from one thought to the next. Start casual, get real in the middle, end with something that makes the reader smile. It should feel like meeting someone at a dinner party who turns out to be way more interesting than their job title suggests.`,
+  };
+  return styles[selectedStyle] || styles.narrative;
+}
+
+const SYSTEM_PROMPT = `You are a LinkedIn post ghostwriter. You write posts that feel deeply human, specific, and real.
+
+TASK: Write a "Let me re-introduce myself" LinkedIn post based on the user's personal details.
+
+${getStyleInstruction ? '' : ''}
+
+ABSOLUTE WRITING RULES — FOLLOW THESE OR THE POST FAILS:
+
+1. ANTI-AI LANGUAGE — NEVER use these words or patterns:
+   - "passionate about", "driven by", "committed to", "dedicated to"
+   - "journey", "landscape", "tapestry", "delve", "foster", "cultivate"
+   - "pivotal", "crucial", "vibrant", "showcase", "underscore", "highlight"
+   - "serves as", "stands as", "represents", "reflects broader"
+   - "In today's world", "In an era of", "It's no secret that"
+   - "I'm thrilled to", "Excited to share", "Proud to announce"
+   - Never start a sentence with "Additionally" or "Furthermore"
+   - Don't use "testament to", "game-changer", "deep dive"
+   - Avoid any phrase that sounds like a LinkedIn cliche or corporate speak
+
+2. TEXTURE OVER GENERICS — Every fact must have a specific detail:
+   - BAD: "I speak 3 languages"
+   - GOOD: "I speak 3 languages — my Italian still has a Bosnian accent that makes Romans smile"
+   - BAD: "I love food"
+   - GOOD: "I'd eat burgers for every meal and I will die on that hill"
+
+3. STRUCTURE:
+   - Use short paragraphs (1-3 sentences max)
+   - Line breaks between paragraphs for LinkedIn readability
+   - Include at least one unexpected contrast (who they were vs who they are now)
+   - End with a specific, personal question — not "feel free to connect"
+
+4. TONE: Like writing a letter to someone you just met and liked immediately. Warm, honest, a little playful. No corporate voice. No motivational speaker voice.
+
+5. LENGTH: Between 1200-2500 characters. LinkedIn sweet spot.
+
+6. The hook (first 1-2 lines) must stop the scroll. Use the new followers number as a natural opening if provided.
+
+7. Do NOT add any explanatory text, headers, or meta-commentary. Return ONLY the post text, ready to paste into LinkedIn.`;
+
+async function generatePost(data) {
+  lastInputData = data;
+  showScreen('screen-generating');
+
+  const systemPrompt = SYSTEM_PROMPT.replace('${getStyleInstruction ? \'\' : \'\'}', '') + '\n\n' + getStyleInstruction();
+
+  const userPrompt = `Write a LinkedIn "Let me re-introduce myself" post for this person:\n\n${buildUserPrompt(data)}\n\nRemember: NO AI-sounding language. Every detail should feel real and specific. Match the style instruction exactly.`;
+
+  try {
+    const result = await callClaude(systemPrompt, userPrompt);
+    document.getElementById('outputText').innerText = result;
+    updateCharCount();
+    showScreen('screen-output');
+  } catch (e) {
+    showError('Generation failed: ' + e.message);
+    showScreen('screen-path');
+  }
+}
+
+function generateFromUpload() { generatePost(collectUploadData()); }
+function generateFromForm() { generatePost(collectFormData()); }
+function generateFromInterview() {
+  // Save last answer
+  const q = INTERVIEW_QS[interviewIdx];
+  interviewAnswers[q.key] = document.getElementById('iv-answer').value.trim();
+  generatePost(interviewAnswers);
+}
+
+function regenerate() { generatePost(lastInputData); }
+
+function startOver() {
+  selectedStyle = null;
+  extractedContext = '';
+  lastInputData = {};
+  interviewAnswers = {};
+  uploadedFileText = '';
+  document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('styleNextBtn').disabled = true;
+  document.getElementById('uploadPersonalQs').style.display = 'none';
+  document.getElementById('fileName').style.display = 'none';
+  showScreen('screen-style');
+}
+
+// ===========================
+// Output
+// ===========================
+function updateCharCount() {
+  const text = document.getElementById('outputText').innerText;
+  const len = text.length;
+  const el = document.getElementById('charCount');
+  el.textContent = `${len.toLocaleString()} characters`;
+  el.className = 'char-count' + (len > 3000 ? ' over' : '');
+}
+
+function copyOutput() {
+  const text = document.getElementById('outputText').innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+}
+
+// ===========================
+// API
+// ===========================
+async function callClaude(systemPrompt, userPrompt) {
+  const res = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || `Server error ${res.status}`);
+  }
+
+  const data = await res.json();
+  return data.content[0].text;
+}
+
+// ===========================
+// Helpers
+// ===========================
+function showError(msg) {
+  const el = document.getElementById('error');
+  el.textContent = msg;
+  el.classList.add('active');
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideError() { document.getElementById('error').classList.remove('active'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
