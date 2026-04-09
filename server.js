@@ -67,22 +67,37 @@ app.post('/api/profile', async (req, res) => {
 
   const aboutExtra = `
 
-ADDITIONAL INSTRUCTION FOR THE ABOUT SECTION:
-Generate TWO variants of the About section:
+CRITICAL OUTPUT FORMAT REQUIREMENT:
+You MUST output ALL sections using these EXACT headers on their own line (no markdown, no ##, no **):
 
-VARIANT A — "Narrative" (label it "ABOUT — NARRATIVE"):
-Follow the structure in the framework (hook, origin story, what you do now, competencies, CTA).
-Write in flowing paragraphs. Conversational tone, like talking to someone you just met.
+HEADLINE
+ABOUT — NARRATIVE
+ABOUT — STRUCTURED
+WORK EXPERIENCE
+SKILLS
+LANGUAGES
+PROJECTS
+EDUCATION
+CERTIFICATIONS
+RECOMMENDATIONS STRATEGY
+FEATURED SECTION
+PROFILE PHOTO AND BANNER
+CUSTOM URL
 
-VARIANT B — "Structured" (label it "ABOUT — STRUCTURED"):
-Same content, but formatted for quick scanning:
-- Short intro (2 sentences max)
-- "What I do:" section with 3-4 concise bullet points
+For the About section, you MUST generate TWO separate variants with the EXACT headers above:
+
+ABOUT — NARRATIVE
+(Write flowing paragraphs here. Hook, origin story, what you do, competencies, CTA. Conversational tone.)
+
+ABOUT — STRUCTURED
+(Same content, reformatted for quick scanning:)
+- Short intro: 2 sentences max
+- "What I do:" with 3-4 concise bullet points
 - "How I can help:" or "Ask me about:" with 2-3 bullets
-- Brief CTA (1 sentence)
-Keep sentences shorter, more compact. No storytelling — just clear, useful information.
+- Brief CTA: 1 sentence
+No storytelling. Short sentences. Compact and scannable.
 
-Clearly separate the two variants with headers so the frontend can parse them.`;
+BOTH About variants are mandatory. Do not skip the structured one. Do not merge them.`;
 
   const systemPrompt = FRAMEWORK_PROMPT + aboutExtra + langInstruction;
 

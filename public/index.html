@@ -1178,47 +1178,57 @@ async function generateFullProfile() {
 function renderProfileSections(text) {
   const container = document.getElementById('profileSections');
 
-  // Try to split the About into two variants
-  const hasNarrative = text.includes('ABOUT — NARRATIVE') || text.includes('ABOUT - NARRATIVE');
-  const hasStructured = text.includes('ABOUT — STRUCTURED') || text.includes('ABOUT - STRUCTURED');
+  // Normalize different header formats: ## HEADER, **HEADER**, ### HEADER → plain HEADER
+  let normalized = text
+    .replace(/^#{1,3}\s+/gm, '')
+    .replace(/^\*\*(.+?)\*\*$/gm, '$1');
 
-  if (hasNarrative && hasStructured) {
-    // Parse out the two variants and the rest
-    const parts = text.split(/ABOUT\s*[—\-]\s*(?:NARRATIVE|STRUCTURED)/gi);
-    const narrativeMatch = text.match(/ABOUT\s*[—\-]\s*NARRATIVE\s*\n([\s\S]*?)(?=ABOUT\s*[—\-]\s*STRUCTURED)/i);
-    const structuredMatch = text.match(/ABOUT\s*[—\-]\s*STRUCTURED\s*\n([\s\S]*?)(?=\n(?:#{1,3}\s|\*\*[A-Z]|[0-9]+\.|WORK|EXPERIENCE|SKILLS|HEADLINE|LANGUAGE|PROJECT|EDUCATION|LICENSE|CERTIF|VOLUNTEER|RECOMMEND|FEATURED|PROFILE|CUSTOM))/i);
+  // Split on the About variants specifically
+  const narrativeRe = /ABOUT\s*[—\-–]+\s*NARRATIVE\s*\n([\s\S]*?)(?=ABOUT\s*[—\-–]+\s*STRUCTURED)/i;
+  const structuredRe = /ABOUT\s*[—\-–]+\s*STRUCTURED\s*\n([\s\S]*?)(?=\n[A-Z][A-Z\s&/]{3,}\n|$)/i;
 
-    const narrativeText = narrativeMatch ? narrativeMatch[1].trim() : '';
-    const structuredText = structuredMatch ? structuredMatch[1].trim() : '';
+  const narrativeMatch = normalized.match(narrativeRe);
+  const structuredMatch = normalized.match(structuredRe);
 
-    // Remove about variants from the main text and split into sections
-    let cleanedText = text;
-    if (narrativeMatch) cleanedText = cleanedText.replace(narrativeMatch[0], 'ABOUT_PLACEHOLDER');
-    if (structuredMatch) cleanedText = cleanedText.replace(/ABOUT\s*[—\-]\s*STRUCTURED\s*\n[\s\S]*?(?=\n(?:#{1,3}\s|\*\*[A-Z]|[0-9]+\.|WORK|EXPERIENCE|SKILLS|HEADLINE|LANGUAGE|PROJECT|EDUCATION|LICENSE|CERTIF|VOLUNTEER|RECOMMEND|FEATURED|PROFILE|CUSTOM))/i, '');
+  const hasAboutVariants = narrativeMatch && structuredMatch;
+  const narrativeText = narrativeMatch ? narrativeMatch[1].trim() : '';
+  const structuredText = structuredMatch ? structuredMatch[1].trim() : '';
 
-    // Build the sections HTML
-    const sections = splitIntoSections(cleanedText);
-    let html = '';
+  // Remove the about variant blocks from text for section parsing
+  let textForSections = normalized;
+  if (hasAboutVariants) {
+    textForSections = textForSections.replace(narrativeRe, 'ABOUT_VARIANTS_PLACEHOLDER\n');
+    textForSections = textForSections.replace(structuredRe, '');
+    // Also remove the structured header line itself
+    textForSections = textForSections.replace(/ABOUT\s*[—\-–]+\s*STRUCTURED\s*\n?/i, '');
+  }
 
-    for (const section of sections) {
-      if (section.title.includes('ABOUT_PLACEHOLDER') || section.body.includes('ABOUT_PLACEHOLDER')) {
-        html += buildAboutSection(narrativeText, structuredText);
-      } else {
-        html += buildSection(section.title, section.body);
-      }
+  const sections = splitIntoSections(textForSections);
+  let html = '';
+
+  for (const section of sections) {
+    if (section.title.includes('ABOUT_VARIANTS_PLACEHOLDER') || section.body.includes('ABOUT_VARIANTS_PLACEHOLDER')) {
+      html += buildAboutSection(narrativeText, structuredText);
+    } else if (hasAboutVariants && /about/i.test(section.title) && !/narrative|structured/i.test(section.title)) {
+      // Generic "About" header — replace with the two variants
+      html += buildAboutSection(narrativeText, structuredText);
+    } else {
+      html += buildSection(section.title, section.body);
     }
+  }
 
-    // If about wasn't placed, add it near the top
-    if (!html.includes('about-tabs')) {
+  // If we have variants but they weren't placed, insert after first section
+  if (hasAboutVariants && !html.includes('about-tabs')) {
+    const firstClose = html.indexOf('</div></div>');
+    if (firstClose > -1) {
+      const pos = firstClose + 12;
+      html = html.slice(0, pos) + buildAboutSection(narrativeText, structuredText) + html.slice(pos);
+    } else {
       html = buildAboutSection(narrativeText, structuredText) + html;
     }
-
-    container.innerHTML = html;
-  } else {
-    // No split — just render the whole thing as sections
-    const sections = splitIntoSections(text);
-    container.innerHTML = sections.map(s => buildSection(s.title, s.body)).join('');
   }
+
+  container.innerHTML = html;
 }
 
 function splitIntoSections(text) {
@@ -1226,22 +1236,31 @@ function splitIntoSections(text) {
   const sections = [];
   let current = null;
 
+  // Match headers: lines that are mostly uppercase, or "1. HEADLINE", or "WORK EXPERIENCE"
+  const isHeader = (line) => {
+    const trimmed = line.trim();
+    if (trimmed.length < 3 || trimmed.length > 80) return false;
+    // Numbered: "1. HEADLINE"
+    if (/^\d+\.\s+[A-Z]/.test(trimmed)) return true;
+    // All-caps or mostly-caps words (allow &, /, -, —)
+    if (/^[A-Z][A-Z\s&/\-—()·,]+$/.test(trimmed) && trimmed.length > 3) return true;
+    // Mixed case known headers
+    if (/^(Headline|About|Work Experience|Skills|Languages|Projects|Education|Certifications|Licenses|Volunteer|Recommendations|Featured|Profile Photo|Custom URL|Top 3 Priorities|Profile Completeness)/i.test(trimmed) && trimmed.length < 50) return true;
+    return false;
+  };
+
   for (const line of lines) {
-    // Detect section headers: ## Header, **HEADER**, or numbered sections like "1. HEADLINE"
-    const headerMatch = line.match(/^(?:#{1,3}\s+|\*\*)?(\d+\.\s+)?([A-Z][A-Z\s&/\(\)]+)(?:\*\*)?$/);
-    if (headerMatch && line.trim().length > 3 && line.trim().length < 80) {
+    if (isHeader(line)) {
       if (current && current.body.trim()) sections.push(current);
-      current = { title: line.replace(/[#*]/g, '').trim(), body: '' };
+      current = { title: line.replace(/^\d+\.\s+/, '').trim(), body: '' };
     } else if (current) {
       current.body += line + '\n';
     } else {
-      // Content before first header
-      if (!current) current = { title: 'Overview', body: '' };
-      current.body += line + '\n';
+      current = { title: 'Overview', body: line + '\n' };
     }
   }
   if (current && current.body.trim()) sections.push(current);
-  return sections;
+  return sections.filter(s => s.body.trim().length > 5);
 }
 
 function buildSection(title, body) {
