@@ -770,30 +770,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
       <div class="loading-text" id="extractLoadingText">Reading your background and extracting key details...</div>
     </div>
 
-    <!-- After extraction: choose what to generate -->
-    <div id="uploadChooseAction" style="display:none">
-      <div class="card">
-        <label>What would you like to generate?</label>
-        <p class="hint">We extracted your professional background. Now pick what you need.</p>
-        <div class="path-grid" style="margin-top:0.75rem">
-          <div class="path-card" onclick="startIntroPostFlow()">
-            <span class="path-icon">✍️</span>
-            <div>
-              <h3>Let me (re)introduce myself post</h3>
-              <p>A warm intro post for LinkedIn. We'll ask a few personal questions to make it real.</p>
-            </div>
-          </div>
-          <div class="path-card" onclick="generateFullProfile()">
-            <span class="path-icon">📋</span>
-            <div>
-              <h3>Full LinkedIn profile</h3>
-              <p>Headline, About (2 variants), Experience, Skills, and more. All optimized from your CV.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Intro post: personal questions -->
     <div id="uploadPersonalQs" style="display:none">
       <div class="card">
@@ -1146,20 +1122,6 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     </div>
   </div>
 
-  <!-- ========== SCREEN 6: FULL PROFILE RESULTS ========== -->
-  <div class="screen" id="screen-profile">
-    <div class="card">
-      <label style="font-size:1.1rem; margin-bottom:0.25rem">Your LinkedIn Profile</label>
-      <p class="hint">Each section is ready to copy. The About section has two variants — pick the one that fits you.</p>
-    </div>
-
-    <div id="profileSections"></div>
-
-    <div class="btn-row" style="justify-content:space-between; margin-top:1rem">
-      <button class="btn-secondary btn-sm" onclick="startOver()">Start over</button>
-      <button class="btn-primary btn-sm" onclick="copyAllProfile()">Copy entire profile</button>
-    </div>
-  </div>
 
   <!-- Toast -->
   <div class="toast" id="toast"></div>
@@ -1302,197 +1264,14 @@ async function processUpload() {
     );
     extractedContext = extracted;
     loader.classList.remove('active');
-    document.getElementById('uploadChooseAction').style.display = 'block';
-    document.getElementById('uploadChooseAction').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('uploadPersonalQs').style.display = 'block';
+    document.getElementById('uploadPersonalQs').scrollIntoView({ behavior: 'smooth' });
   } catch (e) {
     loader.classList.remove('active');
     showError('Extraction failed: ' + e.message);
   }
 }
 
-function startIntroPostFlow() {
-  document.getElementById('uploadChooseAction').style.display = 'none';
-  document.getElementById('uploadPersonalQs').style.display = 'block';
-  document.getElementById('uploadPersonalQs').scrollIntoView({ behavior: 'smooth' });
-}
-
-async function generateFullProfile() {
-  document.getElementById('uploadChooseAction').style.display = 'none';
-  const loader = document.getElementById('extractLoading');
-  document.getElementById('extractLoadingText').textContent = 'Generating your full LinkedIn profile... this takes about a minute';
-  loader.classList.add('active');
-
-  try {
-    const res = await fetch('/api/profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cvText: rawCvText, language: 'en' })
-    });
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error || `Server error ${res.status}`);
-    }
-
-    const data = await res.json();
-    const profileText = data.content[0].text;
-    renderProfileSections(profileText);
-    loader.classList.remove('active');
-    showScreen('screen-profile');
-  } catch (e) {
-    loader.classList.remove('active');
-    showError('Profile generation failed: ' + e.message);
-    document.getElementById('uploadChooseAction').style.display = 'block';
-  }
-}
-
-function renderProfileSections(text) {
-  const container = document.getElementById('profileSections');
-
-  // Normalize different header formats: ## HEADER, **HEADER**, ### HEADER → plain HEADER
-  let normalized = text
-    .replace(/^#{1,3}\s+/gm, '')
-    .replace(/^\*\*(.+?)\*\*$/gm, '$1');
-
-  // Split on the About variants specifically
-  const narrativeRe = /ABOUT\s*[—\-–]+\s*NARRATIVE\s*\n([\s\S]*?)(?=ABOUT\s*[—\-–]+\s*STRUCTURED)/i;
-  const structuredRe = /ABOUT\s*[—\-–]+\s*STRUCTURED\s*\n([\s\S]*?)(?=\n[A-Z][A-Z\s&/]{3,}\n|$)/i;
-
-  const narrativeMatch = normalized.match(narrativeRe);
-  const structuredMatch = normalized.match(structuredRe);
-
-  const hasAboutVariants = narrativeMatch && structuredMatch;
-  const narrativeText = narrativeMatch ? narrativeMatch[1].trim() : '';
-  const structuredText = structuredMatch ? structuredMatch[1].trim() : '';
-
-  // Remove the about variant blocks from text for section parsing
-  let textForSections = normalized;
-  if (hasAboutVariants) {
-    textForSections = textForSections.replace(narrativeRe, 'ABOUT_VARIANTS_PLACEHOLDER\n');
-    textForSections = textForSections.replace(structuredRe, '');
-    // Also remove the structured header line itself
-    textForSections = textForSections.replace(/ABOUT\s*[—\-–]+\s*STRUCTURED\s*\n?/i, '');
-  }
-
-  const sections = splitIntoSections(textForSections);
-  let html = '';
-
-  for (const section of sections) {
-    if (section.title.includes('ABOUT_VARIANTS_PLACEHOLDER') || section.body.includes('ABOUT_VARIANTS_PLACEHOLDER')) {
-      html += buildAboutSection(narrativeText, structuredText);
-    } else if (hasAboutVariants && /about/i.test(section.title) && !/narrative|structured/i.test(section.title)) {
-      // Generic "About" header — replace with the two variants
-      html += buildAboutSection(narrativeText, structuredText);
-    } else {
-      html += buildSection(section.title, section.body);
-    }
-  }
-
-  // If we have variants but they weren't placed, insert after first section
-  if (hasAboutVariants && !html.includes('about-tabs')) {
-    const firstClose = html.indexOf('</div></div>');
-    if (firstClose > -1) {
-      const pos = firstClose + 12;
-      html = html.slice(0, pos) + buildAboutSection(narrativeText, structuredText) + html.slice(pos);
-    } else {
-      html = buildAboutSection(narrativeText, structuredText) + html;
-    }
-  }
-
-  container.innerHTML = html;
-}
-
-function splitIntoSections(text) {
-  const lines = text.split('\n');
-  const sections = [];
-  let current = null;
-
-  // Match headers: lines that are mostly uppercase, or "1. HEADLINE", or "WORK EXPERIENCE"
-  const isHeader = (line) => {
-    const trimmed = line.trim();
-    if (trimmed.length < 3 || trimmed.length > 80) return false;
-    // Numbered: "1. HEADLINE"
-    if (/^\d+\.\s+[A-Z]/.test(trimmed)) return true;
-    // All-caps or mostly-caps words (allow &, /, -, —)
-    if (/^[A-Z][A-Z\s&/\-—()·,]+$/.test(trimmed) && trimmed.length > 3) return true;
-    // Mixed case known headers
-    if (/^(Headline|About|Work Experience|Skills|Languages|Projects|Education|Certifications|Licenses|Volunteer|Recommendations|Featured|Profile Photo|Custom URL|Top 3 Priorities|Profile Completeness)/i.test(trimmed) && trimmed.length < 50) return true;
-    return false;
-  };
-
-  for (const line of lines) {
-    if (isHeader(line)) {
-      if (current && current.body.trim()) sections.push(current);
-      current = { title: line.replace(/^\d+\.\s+/, '').trim(), body: '' };
-    } else if (current) {
-      current.body += line + '\n';
-    } else {
-      current = { title: 'Overview', body: line + '\n' };
-    }
-  }
-  if (current && current.body.trim()) sections.push(current);
-  return sections.filter(s => s.body.trim().length > 5);
-}
-
-function buildSection(title, body) {
-  const id = 'sec-' + title.replace(/\s+/g, '-').toLowerCase().replace(/[^a-z0-9-]/g, '');
-  return `
-    <div class="profile-section">
-      <div class="profile-section-header">
-        <h3>${esc(title)}</h3>
-        <button class="copy-section-btn" onclick="copySection('${id}')">Copy</button>
-      </div>
-      <div class="profile-section-body" id="${id}">${esc(body.trim())}</div>
-    </div>`;
-}
-
-function buildAboutSection(narrative, structured) {
-  return `
-    <div class="profile-section">
-      <div class="profile-section-header">
-        <h3>About</h3>
-        <button class="copy-section-btn" onclick="copyActiveAbout()">Copy</button>
-      </div>
-      <div class="about-tabs">
-        <button class="about-tab active" onclick="switchAbout('narrative', this)">Narrative</button>
-        <button class="about-tab" onclick="switchAbout('structured', this)">Structured</button>
-      </div>
-      <div class="about-variant active" id="about-narrative">
-        <div class="profile-section-body">${esc(narrative)}</div>
-      </div>
-      <div class="about-variant" id="about-structured">
-        <div class="profile-section-body">${esc(structured)}</div>
-      </div>
-    </div>`;
-}
-
-function switchAbout(variant, btn) {
-  document.querySelectorAll('.about-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.about-variant').forEach(v => v.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('about-' + variant).classList.add('active');
-}
-
-function copySection(id) {
-  const el = document.getElementById(id);
-  if (el) {
-    navigator.clipboard.writeText(el.textContent).then(() => showToast('Section copied!'));
-  }
-}
-
-function copyActiveAbout() {
-  const active = document.querySelector('.about-variant.active .profile-section-body');
-  if (active) {
-    navigator.clipboard.writeText(active.textContent).then(() => showToast('About section copied!'));
-  }
-}
-
-function copyAllProfile() {
-  const bodies = document.querySelectorAll('#profileSections .profile-section-body');
-  let all = '';
-  bodies.forEach(b => { all += b.textContent.trim() + '\n\n---\n\n'; });
-  navigator.clipboard.writeText(all.trim()).then(() => showToast('Full profile copied!'));
-}
 
 // ===========================
 // Interview path
