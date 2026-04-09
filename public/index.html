@@ -525,6 +525,88 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 .toast.show { opacity: 1; transform: translateY(0); }
 
+/* Profile sections */
+.profile-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.profile-section-header h3 {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.profile-section-body {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.copy-section-btn {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.copy-section-btn:hover {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* About variant tabs */
+.about-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.about-tab {
+  padding: 0.5rem 1.25rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.about-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.about-variant { display: none; }
+.about-variant.active { display: block; }
+
 /* Responsive */
 @media (max-width: 640px) {
   .container { padding: 1.5rem 1rem; }
@@ -656,14 +738,38 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     <!-- Loading for extraction -->
     <div class="loading" id="extractLoading">
       <div class="dots"><span></span><span></span><span></span></div>
-      <div class="loading-text">Reading your background and extracting key details...</div>
+      <div class="loading-text" id="extractLoadingText">Reading your background and extracting key details...</div>
     </div>
 
-    <!-- After extraction: personal questions only -->
+    <!-- After extraction: choose what to generate -->
+    <div id="uploadChooseAction" style="display:none">
+      <div class="card">
+        <label>What would you like to generate?</label>
+        <p class="hint">We extracted your professional background. Now pick what you need.</p>
+        <div class="path-grid" style="margin-top:0.75rem">
+          <div class="path-card" onclick="startIntroPostFlow()">
+            <span class="path-icon">✍️</span>
+            <div>
+              <h3>(Re)introduce myself post</h3>
+              <p>A warm intro post for LinkedIn. We'll ask a few personal questions to make it real.</p>
+            </div>
+          </div>
+          <div class="path-card" onclick="generateFullProfile()">
+            <span class="path-icon">📋</span>
+            <div>
+              <h3>Full LinkedIn profile</h3>
+              <p>Headline, About (2 variants), Experience, Skills, and more. All optimized from your CV.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Intro post: personal questions -->
     <div id="uploadPersonalQs" style="display:none">
       <div class="card">
-        <label>Great, we got the professional stuff. Now the fun part.</label>
-        <p class="hint">These personal details are what make the post interesting</p>
+        <label>Now the fun part — personal details that make the post interesting.</label>
+        <p class="hint">Fill in what you can. The more specific, the better.</p>
 
         <div class="form-group">
           <label for="up-hook">How many new followers/connections did you get recently?</label>
@@ -873,6 +979,21 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     </div>
   </div>
 
+  <!-- ========== SCREEN 6: FULL PROFILE RESULTS ========== -->
+  <div class="screen" id="screen-profile">
+    <div class="card">
+      <label style="font-size:1.1rem; margin-bottom:0.25rem">Your LinkedIn Profile</label>
+      <p class="hint">Each section is ready to copy. The About section has two variants — pick the one that fits you.</p>
+    </div>
+
+    <div id="profileSections"></div>
+
+    <div class="btn-row" style="justify-content:space-between; margin-top:1rem">
+      <button class="btn-secondary btn-sm" onclick="startOver()">Start over</button>
+      <button class="btn-primary btn-sm" onclick="copyAllProfile()">Copy entire profile</button>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 </div>
@@ -991,12 +1112,16 @@ function switchTab(tabId, btn) {
   document.getElementById('tab-' + tabId).classList.add('active');
 }
 
+let rawCvText = '';
+
 async function processUpload() {
   const text = uploadedFileText || document.getElementById('pasteText').value.trim();
   if (!text) { showError('Please upload a file or paste your text first.'); return; }
   hideError();
 
+  rawCvText = text;
   const loader = document.getElementById('extractLoading');
+  document.getElementById('extractLoadingText').textContent = 'Reading your background and extracting key details...';
   loader.classList.add('active');
 
   try {
@@ -1006,12 +1131,177 @@ async function processUpload() {
     );
     extractedContext = extracted;
     loader.classList.remove('active');
-    document.getElementById('uploadPersonalQs').style.display = 'block';
-    document.getElementById('uploadPersonalQs').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('uploadChooseAction').style.display = 'block';
+    document.getElementById('uploadChooseAction').scrollIntoView({ behavior: 'smooth' });
   } catch (e) {
     loader.classList.remove('active');
     showError('Extraction failed: ' + e.message);
   }
+}
+
+function startIntroPostFlow() {
+  document.getElementById('uploadChooseAction').style.display = 'none';
+  document.getElementById('uploadPersonalQs').style.display = 'block';
+  document.getElementById('uploadPersonalQs').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function generateFullProfile() {
+  document.getElementById('uploadChooseAction').style.display = 'none';
+  const loader = document.getElementById('extractLoading');
+  document.getElementById('extractLoadingText').textContent = 'Generating your full LinkedIn profile... this takes about a minute';
+  loader.classList.add('active');
+
+  try {
+    const res = await fetch('/api/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cvText: rawCvText, language: 'en' })
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || `Server error ${res.status}`);
+    }
+
+    const data = await res.json();
+    const profileText = data.content[0].text;
+    renderProfileSections(profileText);
+    loader.classList.remove('active');
+    showScreen('screen-profile');
+  } catch (e) {
+    loader.classList.remove('active');
+    showError('Profile generation failed: ' + e.message);
+    document.getElementById('uploadChooseAction').style.display = 'block';
+  }
+}
+
+function renderProfileSections(text) {
+  const container = document.getElementById('profileSections');
+
+  // Try to split the About into two variants
+  const hasNarrative = text.includes('ABOUT — NARRATIVE') || text.includes('ABOUT - NARRATIVE');
+  const hasStructured = text.includes('ABOUT — STRUCTURED') || text.includes('ABOUT - STRUCTURED');
+
+  if (hasNarrative && hasStructured) {
+    // Parse out the two variants and the rest
+    const parts = text.split(/ABOUT\s*[—\-]\s*(?:NARRATIVE|STRUCTURED)/gi);
+    const narrativeMatch = text.match(/ABOUT\s*[—\-]\s*NARRATIVE\s*\n([\s\S]*?)(?=ABOUT\s*[—\-]\s*STRUCTURED)/i);
+    const structuredMatch = text.match(/ABOUT\s*[—\-]\s*STRUCTURED\s*\n([\s\S]*?)(?=\n(?:#{1,3}\s|\*\*[A-Z]|[0-9]+\.|WORK|EXPERIENCE|SKILLS|HEADLINE|LANGUAGE|PROJECT|EDUCATION|LICENSE|CERTIF|VOLUNTEER|RECOMMEND|FEATURED|PROFILE|CUSTOM))/i);
+
+    const narrativeText = narrativeMatch ? narrativeMatch[1].trim() : '';
+    const structuredText = structuredMatch ? structuredMatch[1].trim() : '';
+
+    // Remove about variants from the main text and split into sections
+    let cleanedText = text;
+    if (narrativeMatch) cleanedText = cleanedText.replace(narrativeMatch[0], 'ABOUT_PLACEHOLDER');
+    if (structuredMatch) cleanedText = cleanedText.replace(/ABOUT\s*[—\-]\s*STRUCTURED\s*\n[\s\S]*?(?=\n(?:#{1,3}\s|\*\*[A-Z]|[0-9]+\.|WORK|EXPERIENCE|SKILLS|HEADLINE|LANGUAGE|PROJECT|EDUCATION|LICENSE|CERTIF|VOLUNTEER|RECOMMEND|FEATURED|PROFILE|CUSTOM))/i, '');
+
+    // Build the sections HTML
+    const sections = splitIntoSections(cleanedText);
+    let html = '';
+
+    for (const section of sections) {
+      if (section.title.includes('ABOUT_PLACEHOLDER') || section.body.includes('ABOUT_PLACEHOLDER')) {
+        html += buildAboutSection(narrativeText, structuredText);
+      } else {
+        html += buildSection(section.title, section.body);
+      }
+    }
+
+    // If about wasn't placed, add it near the top
+    if (!html.includes('about-tabs')) {
+      html = buildAboutSection(narrativeText, structuredText) + html;
+    }
+
+    container.innerHTML = html;
+  } else {
+    // No split — just render the whole thing as sections
+    const sections = splitIntoSections(text);
+    container.innerHTML = sections.map(s => buildSection(s.title, s.body)).join('');
+  }
+}
+
+function splitIntoSections(text) {
+  const lines = text.split('\n');
+  const sections = [];
+  let current = null;
+
+  for (const line of lines) {
+    // Detect section headers: ## Header, **HEADER**, or numbered sections like "1. HEADLINE"
+    const headerMatch = line.match(/^(?:#{1,3}\s+|\*\*)?(\d+\.\s+)?([A-Z][A-Z\s&/\(\)]+)(?:\*\*)?$/);
+    if (headerMatch && line.trim().length > 3 && line.trim().length < 80) {
+      if (current && current.body.trim()) sections.push(current);
+      current = { title: line.replace(/[#*]/g, '').trim(), body: '' };
+    } else if (current) {
+      current.body += line + '\n';
+    } else {
+      // Content before first header
+      if (!current) current = { title: 'Overview', body: '' };
+      current.body += line + '\n';
+    }
+  }
+  if (current && current.body.trim()) sections.push(current);
+  return sections;
+}
+
+function buildSection(title, body) {
+  const id = 'sec-' + title.replace(/\s+/g, '-').toLowerCase().replace(/[^a-z0-9-]/g, '');
+  return `
+    <div class="profile-section">
+      <div class="profile-section-header">
+        <h3>${esc(title)}</h3>
+        <button class="copy-section-btn" onclick="copySection('${id}')">Copy</button>
+      </div>
+      <div class="profile-section-body" id="${id}">${esc(body.trim())}</div>
+    </div>`;
+}
+
+function buildAboutSection(narrative, structured) {
+  return `
+    <div class="profile-section">
+      <div class="profile-section-header">
+        <h3>About</h3>
+        <button class="copy-section-btn" onclick="copyActiveAbout()">Copy</button>
+      </div>
+      <div class="about-tabs">
+        <button class="about-tab active" onclick="switchAbout('narrative', this)">Narrative</button>
+        <button class="about-tab" onclick="switchAbout('structured', this)">Structured</button>
+      </div>
+      <div class="about-variant active" id="about-narrative">
+        <div class="profile-section-body">${esc(narrative)}</div>
+      </div>
+      <div class="about-variant" id="about-structured">
+        <div class="profile-section-body">${esc(structured)}</div>
+      </div>
+    </div>`;
+}
+
+function switchAbout(variant, btn) {
+  document.querySelectorAll('.about-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.about-variant').forEach(v => v.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('about-' + variant).classList.add('active');
+}
+
+function copySection(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    navigator.clipboard.writeText(el.textContent).then(() => showToast('Section copied!'));
+  }
+}
+
+function copyActiveAbout() {
+  const active = document.querySelector('.about-variant.active .profile-section-body');
+  if (active) {
+    navigator.clipboard.writeText(active.textContent).then(() => showToast('About section copied!'));
+  }
+}
+
+function copyAllProfile() {
+  const bodies = document.querySelectorAll('#profileSections .profile-section-body');
+  let all = '';
+  bodies.forEach(b => { all += b.textContent.trim() + '\n\n---\n\n'; });
+  navigator.clipboard.writeText(all.trim()).then(() => showToast('Full profile copied!'));
 }
 
 // ===========================
