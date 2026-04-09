@@ -249,6 +249,23 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   line-height: 1.45;
 }
 
+.style-card .style-preview {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0.7rem 0.8rem;
+  margin-top: 0.6rem;
+  line-height: 1.5;
+  font-style: italic;
+  border-left: 2px solid var(--border);
+}
+
+.style-card.selected .style-preview {
+  background: rgba(26,86,219,0.04);
+  border-left-color: var(--accent);
+}
+
 .style-card .style-tag {
   display: inline-block;
   font-size: 0.68rem;
@@ -622,7 +639,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 <div class="container">
   <div class="header">
     <h1>Write Your First LinkedIn Post That Sounds Like <em>You</em></h1>
-    <p class="subtitle">Answer a few questions and get a ready-to-paste<br>&ldquo;(re)introduce myself&rdquo; post.</p>
+    <p class="subtitle">Answer a few questions and get a ready-to-paste<br>&ldquo;Let me (re)introduce myself&rdquo; post.</p>
   </div>
 
   <div class="error" id="error"></div>
@@ -637,24 +654,28 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
         <div class="style-card" data-style="numbered" onclick="selectStyle(this)">
           <h3>Numbered Facts</h3>
           <p>Clean, scannable list with emoji bullets. Quick, fun, easy to read.</p>
+          <div class="style-preview">1. I once quit a stable job to build something nobody believed in.<br>2. 3 countries, 2 pivots, 1 mission.<br>3. I still google "how to be a good manager."</div>
           <span class="style-tag">Light & professional</span>
         </div>
 
         <div class="style-card" data-style="narrative" onclick="selectStyle(this)">
           <h3>Personal Narrative</h3>
           <p>Flowing story with personality, humor, and unexpected contrasts.</p>
+          <div class="style-preview">Five years ago I was sitting in a cubicle wondering if this was it. Today I run a team of 20 and still feel like an imposter every Monday morning.</div>
           <span class="style-tag">Deep & personal</span>
         </div>
 
         <div class="style-card" data-style="authority" onclick="selectStyle(this)">
           <h3>Authority + Heart</h3>
           <p>Lead with credibility and numbers, then reveal the human side.</p>
+          <div class="style-preview">I've helped 200+ founders raise $50M combined. But the best lesson I learned? It came from my 6-year-old daughter.</div>
           <span class="style-tag">Impressive & warm</span>
         </div>
 
         <div class="style-card" data-style="letter" onclick="selectStyle(this)">
           <h3>Letter to a Friend</h3>
           <p>No structure, just a warm conversational letter. Like talking to someone you just met and liked.</p>
+          <div class="style-preview">Hey, so I realized we've never properly met. I'm the person behind the profile picture. Let me fix that.</div>
           <span class="style-tag">Intimate & honest</span>
         </div>
       </div>
@@ -693,6 +714,14 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
           <div>
             <h3>I'll fill out the full form</h3>
             <p>See all the questions at once. Best if you already know exactly what you want to say.</p>
+          </div>
+        </div>
+
+        <div class="path-card" onclick="choosePath('voice')" style="border-left: 3px solid var(--accent);">
+          <span class="path-icon">🎙️</span>
+          <div>
+            <h3>Your Claude Voice</h3>
+            <p>Upload your tone-of-voice document (from the Claude prompt). We'll write the post in <em>your</em> personal style instead of a preset.</p>
           </div>
         </div>
       </div>
@@ -750,7 +779,7 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
           <div class="path-card" onclick="startIntroPostFlow()">
             <span class="path-icon">✍️</span>
             <div>
-              <h3>(Re)introduce myself post</h3>
+              <h3>Let me (re)introduce myself post</h3>
               <p>A warm intro post for LinkedIn. We'll ask a few personal questions to make it real.</p>
             </div>
           </div>
@@ -950,6 +979,144 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
     </div>
   </div>
 
+  <!-- ========== SCREEN 3D: VOICE PATH ========== -->
+  <div class="screen" id="screen-voice">
+    <div class="card">
+      <label>Upload your tone-of-voice document</label>
+      <p class="hint">This is the document you got from the Claude "find your voice" prompt. We'll use it as your writing style.</p>
+
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchVoiceTab('voice-file', this)">Upload file</button>
+        <button class="tab-btn" onclick="switchVoiceTab('voice-paste', this)">Paste text</button>
+      </div>
+
+      <div class="tab-content active" id="tab-voice-file">
+        <div class="upload-area" id="voiceUploadArea">
+          <div class="upload-icon">🎙️</div>
+          <p>Drop your tone-of-voice document here<br>or click to browse</p>
+          <p class="file-name" id="voiceFileName" style="display:none"></p>
+          <input type="file" id="voiceFileInput" accept=".pdf,.txt,.doc,.docx" style="display:none">
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-voice-paste">
+        <div class="form-group">
+          <textarea id="voicePasteText" rows="8" placeholder="Paste your tone-of-voice description here..."></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-outline btn-sm" onclick="showScreen('screen-path')">Back</button>
+        <button class="btn-primary" onclick="processVoiceUpload()">Continue</button>
+      </div>
+    </div>
+
+    <!-- After voice doc loaded: personal questions (same as upload path) -->
+    <div id="voicePersonalQs" style="display:none">
+      <div class="card">
+        <label>Share your professional context</label>
+        <p class="hint">Upload your CV or paste your bio so we know who you are</p>
+
+        <div class="tab-row">
+          <button class="tab-btn active" onclick="switchVoiceCvTab('voicecv-file', this)">Upload file</button>
+          <button class="tab-btn" onclick="switchVoiceCvTab('voicecv-paste', this)">Paste text</button>
+        </div>
+
+        <div class="tab-content active" id="tab-voicecv-file">
+          <div class="upload-area" id="voiceCvUploadArea">
+            <div class="upload-icon">📎</div>
+            <p>Drop your CV or resume here<br>or click to browse</p>
+            <p class="file-name" id="voiceCvFileName" style="display:none"></p>
+            <input type="file" id="voiceCvFileInput" accept=".pdf,.txt,.doc,.docx" style="display:none">
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-voicecv-paste">
+          <div class="form-group">
+            <textarea id="voiceCvPasteText" rows="8" placeholder="Paste your LinkedIn About section, bio, resume text..."></textarea>
+          </div>
+        </div>
+
+        <div class="btn-row btn-row-right">
+          <button class="btn-primary" onclick="processVoiceCv()">Extract & continue</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading for voice extraction -->
+    <div class="loading" id="voiceExtractLoading">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <div class="loading-text">Reading your background...</div>
+    </div>
+
+    <!-- Voice: personal questions -->
+    <div id="voicePersonalQsFull" style="display:none">
+      <div class="card">
+        <label>Now the fun part — personal details that make the post interesting.</label>
+        <p class="hint">Fill in what you can. The more specific, the better.</p>
+
+        <div class="form-group">
+          <label for="v-hook">How many new followers/connections did you get recently?</label>
+          <input type="text" id="v-hook" placeholder="e.g. 2,000 new connections this month">
+        </div>
+
+        <div class="form-group">
+          <label for="v-surprise">What did you do before your current work that would surprise people?</label>
+          <textarea id="v-surprise" placeholder="e.g. I was a competitive chess player and a wedding DJ before I got into tech"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="v-pivot">Was there one moment or decision that changed your path?</label>
+          <textarea id="v-pivot" placeholder="e.g. I quit my corporate job the day my boss told me 'that's not how we do things here'"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="v-good">One thing you're irrationally good at (not work-related)</label>
+          <input type="text" id="v-good" placeholder="e.g. Parallel parking in impossibly tight spots">
+        </div>
+
+        <div class="form-group">
+          <label for="v-bad">One thing you're embarrassingly bad at</label>
+          <input type="text" id="v-bad" placeholder="e.g. Keeping plants alive">
+        </div>
+
+        <div class="form-group">
+          <label for="v-food">Food you love / food you hate</label>
+          <input type="text" id="v-food" placeholder="e.g. I'd eat sushi every day / can't stand celery">
+        </div>
+
+        <div class="form-group">
+          <label for="v-quirk">A quirk or habit people who know you would recognize</label>
+          <input type="text" id="v-quirk" placeholder="e.g. I narrate what I'm cooking like it's a cooking show">
+        </div>
+
+        <div class="form-group">
+          <label for="v-cares">What do you care about that isn't your career?</label>
+          <textarea id="v-cares" placeholder="e.g. My daughter's laugh, ocean conservation"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="v-vulnerable">One thing about your journey that was genuinely hard — that you're now okay sharing</label>
+          <textarea id="v-vulnerable" placeholder="e.g. I went broke twice before age 30"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>How do you want to close the post?</label>
+          <p class="hint">A warm, light sign-off</p>
+          <div class="option-grid" id="v-cta-options">
+            <div class="option-card" onclick="selectOption(this, 'v-cta-options')">Happy to be here — let's connect and chat!</div>
+            <div class="option-card" onclick="selectOption(this, 'v-cta-options')">If you have any questions, feel free to reach out. My DMs are open.</div>
+            <div class="option-card" onclick="selectOption(this, 'v-cta-options')">Looking forward to meeting new people here. Don't be a stranger!</div>
+          </div>
+        </div>
+
+        <div class="btn-row btn-row-right">
+          <button class="btn-green" onclick="generateFromVoice()">Generate my post</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== SCREEN 4: GENERATING ========== -->
   <div class="screen" id="screen-generating">
     <div class="card" style="text-align:center; padding:3rem">
@@ -1005,6 +1172,9 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 let selectedStyle = null;
 let extractedContext = '';
 let lastInputData = {};
+let voiceDocText = '';
+let voiceCvFileText = '';
+let voiceExtractedContext = '';
 
 // ===========================
 // Interview questions
@@ -1059,6 +1229,7 @@ function choosePath(path) {
   if (path === 'upload') showScreen('screen-upload');
   else if (path === 'interview') { interviewIdx = 0; interviewAnswers = {}; renderInterviewQ(); showScreen('screen-interview'); }
   else if (path === 'form') showScreen('screen-form');
+  else if (path === 'voice') { setupVoiceUpload(); showScreen('screen-voice'); }
 }
 
 // ===========================
@@ -1480,6 +1651,9 @@ function getStyleInstruction() {
     authority: `STYLE: "Authority + Heart" — Open with a strong credibility statement (followers, achievements, what they're known for). Then break the professional mask and reveal the human underneath. Structure: what people know me for -> what people don't know about me -> what drives me. End with the user's chosen warm CTA sign-off.`,
     letter: `STYLE: "Letter to a Friend" — Write like a personal letter. No structure, no bullets, no headers. Just warmth and honesty flowing from one thought to the next. Start casual, get real in the middle, end with something that makes the reader smile. End with the user's chosen warm CTA sign-off.`,
   };
+  if (selectedStyle === 'voice' && voiceDocText) {
+    return `STYLE: Use the following tone-of-voice document as the writing style. Match the voice, rhythm, vocabulary, and personality described in it exactly. Do NOT use a generic style — this person has a specific voice:\n\n${voiceDocText}`;
+  }
   return styles[selectedStyle] || styles.narrative;
 }
 
@@ -1597,6 +1771,166 @@ function generateFromInterview() {
   generatePost(interviewAnswers);
 }
 
+// ===========================
+// Voice path
+// ===========================
+let voiceUploadSetup = false;
+let voiceCvUploadSetup = false;
+
+function setupVoiceUpload() {
+  if (voiceUploadSetup) return;
+  voiceUploadSetup = true;
+
+  const area = document.getElementById('voiceUploadArea');
+  const inp = document.getElementById('voiceFileInput');
+
+  area.addEventListener('click', () => inp.click());
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
+  area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+  area.addEventListener('drop', e => {
+    e.preventDefault();
+    area.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleVoiceFile(e.dataTransfer.files[0]);
+  });
+  inp.addEventListener('change', () => { if (inp.files.length) handleVoiceFile(inp.files[0]); });
+}
+
+function setupVoiceCvUpload() {
+  if (voiceCvUploadSetup) return;
+  voiceCvUploadSetup = true;
+
+  const area = document.getElementById('voiceCvUploadArea');
+  const inp = document.getElementById('voiceCvFileInput');
+
+  area.addEventListener('click', () => inp.click());
+  area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
+  area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+  area.addEventListener('drop', e => {
+    e.preventDefault();
+    area.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleVoiceCvFile(e.dataTransfer.files[0]);
+  });
+  inp.addEventListener('change', () => { if (inp.files.length) handleVoiceCvFile(inp.files[0]); });
+}
+
+async function handleVoiceFile(file) {
+  const fn = document.getElementById('voiceFileName');
+  fn.textContent = file.name;
+  fn.style.display = 'block';
+
+  if (file.type === 'application/pdf') {
+    try {
+      const arrayBuf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + '\n';
+      }
+      voiceDocText = text;
+    } catch (e) {
+      showError('Could not read PDF. Try pasting the text instead.');
+    }
+  } else {
+    voiceDocText = await file.text();
+  }
+}
+
+async function handleVoiceCvFile(file) {
+  const fn = document.getElementById('voiceCvFileName');
+  fn.textContent = file.name;
+  fn.style.display = 'block';
+
+  if (file.type === 'application/pdf') {
+    try {
+      const arrayBuf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        text += content.items.map(item => item.str).join(' ') + '\n';
+      }
+      voiceCvFileText = text;
+    } catch (e) {
+      showError('Could not read PDF. Try pasting the text instead.');
+    }
+  } else {
+    voiceCvFileText = await file.text();
+  }
+}
+
+function switchVoiceTab(tabId, btn) {
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-voice-file').classList.remove('active');
+  document.getElementById('tab-voice-paste').classList.remove('active');
+  btn.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+function switchVoiceCvTab(tabId, btn) {
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-voicecv-file').classList.remove('active');
+  document.getElementById('tab-voicecv-paste').classList.remove('active');
+  btn.classList.add('active');
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+
+function processVoiceUpload() {
+  const text = voiceDocText || document.getElementById('voicePasteText').value.trim();
+  if (!text) { showError('Please upload your tone-of-voice document or paste it.'); return; }
+  hideError();
+  voiceDocText = text;
+  selectedStyle = 'voice';
+  document.getElementById('voicePersonalQs').style.display = 'block';
+  document.getElementById('voicePersonalQs').scrollIntoView({ behavior: 'smooth' });
+  setupVoiceCvUpload();
+}
+
+async function processVoiceCv() {
+  const text = voiceCvFileText || document.getElementById('voiceCvPasteText').value.trim();
+  if (!text) { showError('Please upload your CV or paste your bio.'); return; }
+  hideError();
+
+  const loader = document.getElementById('voiceExtractLoading');
+  loader.classList.add('active');
+
+  try {
+    const extracted = await callClaude(
+      'You extract professional information from resumes, CVs, bios, and LinkedIn profiles. Return a clean summary with: Full Name, Current Role/Title, Location, Career History (chronological, brief), Key Achievements/Numbers, Education, Languages, and any other notable professional facts. Be concise. Return plain text, no JSON.',
+      'Extract the professional details from this text:\n\n' + text
+    );
+    voiceExtractedContext = extracted;
+    loader.classList.remove('active');
+    document.getElementById('voicePersonalQs').style.display = 'none';
+    document.getElementById('voicePersonalQsFull').style.display = 'block';
+    document.getElementById('voicePersonalQsFull').scrollIntoView({ behavior: 'smooth' });
+  } catch (e) {
+    loader.classList.remove('active');
+    showError('Extraction failed: ' + e.message);
+  }
+}
+
+function collectVoiceData() {
+  const sel = document.querySelector('#v-cta-options .option-card.selected');
+  return {
+    extractedContext: voiceExtractedContext,
+    hook: document.getElementById('v-hook').value.trim(),
+    before: document.getElementById('v-surprise').value.trim(),
+    pivot: document.getElementById('v-pivot').value.trim(),
+    good: document.getElementById('v-good').value.trim(),
+    bad: document.getElementById('v-bad').value.trim(),
+    food: document.getElementById('v-food').value.trim(),
+    quirk: document.getElementById('v-quirk').value.trim(),
+    cares: document.getElementById('v-cares').value.trim(),
+    vulnerable: document.getElementById('v-vulnerable').value.trim(),
+    cta: sel ? sel.textContent : '',
+  };
+}
+
+function generateFromVoice() { generatePost(collectVoiceData()); }
+
 function regenerate() { generatePost(lastInputData); }
 
 function startOver() {
@@ -1605,10 +1939,17 @@ function startOver() {
   lastInputData = {};
   interviewAnswers = {};
   uploadedFileText = '';
+  voiceDocText = '';
+  voiceCvFileText = '';
+  voiceExtractedContext = '';
   document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('styleNextBtn').disabled = true;
   document.getElementById('uploadPersonalQs').style.display = 'none';
   document.getElementById('fileName').style.display = 'none';
+  document.getElementById('voicePersonalQs').style.display = 'none';
+  document.getElementById('voicePersonalQsFull').style.display = 'none';
+  document.getElementById('voiceFileName').style.display = 'none';
+  document.getElementById('voiceCvFileName').style.display = 'none';
   showScreen('screen-style');
 }
 
